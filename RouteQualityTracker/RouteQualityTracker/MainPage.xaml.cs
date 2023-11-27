@@ -4,10 +4,10 @@ namespace RouteQualityTracker;
 
 public partial class MainPage : ContentPage, ITrackingButtonsHandler
 {
-    private readonly IForegroundService _foregroundService;
+    private readonly IServiceManager _foregroundService;
     private int _count;
 
-    public MainPage(IForegroundService foregroundService)
+    public MainPage(IServiceManager foregroundService)
     {
         _foregroundService = foregroundService;
         InitializeComponent();
@@ -17,7 +17,7 @@ public partial class MainPage : ContentPage, ITrackingButtonsHandler
     {
         var isRunning = _foregroundService.ToggleService();
 
-        ToggleServiceBtn.Text = isRunning ? "Start service" : "Stop service";
+        ToggleServiceBtn.Text = isRunning ? "Stop service" : "Start service";
     }
 
     private void OnCounterClicked(object sender, EventArgs e)

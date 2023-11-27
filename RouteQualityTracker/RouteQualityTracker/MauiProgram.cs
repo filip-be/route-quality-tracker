@@ -18,7 +18,7 @@ public static class MauiProgram
             });
 
         builder.Services.AddSingleton<MainPage>();
-        builder.Services.AddSingleton<IForegroundService, ForegroundService>();
+        builder.Services.AddSingleton<IServiceManager, ServiceManager>();
 
 #if DEBUG
         builder.Logging.AddDebug();

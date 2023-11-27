@@ -8,7 +8,7 @@ namespace RouteQualityTracker.Platforms.Android;
 
 public class AndroidForegroundService : Service
 {
-    public AndroidForegroundService(IForegroundService foregroundService)
+    public AndroidForegroundService(IServiceManager foregroundService)
     {
         foregroundService.OnServiceStart += OnServiceStart;
         foregroundService.OnServiceStop += OnServiceStop;

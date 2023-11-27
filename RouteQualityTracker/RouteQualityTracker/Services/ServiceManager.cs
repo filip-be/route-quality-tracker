@@ -2,7 +2,7 @@
 
 namespace RouteQualityTracker.Services;
 
-public class ForegroundService : IForegroundService
+public class ServiceManager : IServiceManager
 {
     private bool IsServiceRunning { get; set; }
         
