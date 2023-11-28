@@ -20,10 +20,18 @@ public static class MauiProgram
         builder.Services.AddSingleton<MainPage>();
         builder.Services.AddSingleton<IServiceManager, ServiceManager>();
 
+#if ANDROID
+        builder.Services.AddSingleton<MainActivity>();
+#endif
+
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
 
-        return builder.Build();
+        var app = builder.Build();
+
+        ServiceHelper.Initialize(app.Services);
+
+        return app;
     }
 }
