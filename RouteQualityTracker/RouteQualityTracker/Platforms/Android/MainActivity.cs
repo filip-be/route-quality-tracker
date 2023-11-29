@@ -16,15 +16,24 @@ public class MainActivity : MauiAppCompatActivity
     private class BluetoothCallback : CompanionDeviceManager.Callback
     {
         private readonly ITrackingButtonsHandler _trackingButtonsHandler;
+        private readonly Activity _activity;
 
-        public BluetoothCallback(ITrackingButtonsHandler trackingButtonsHandler) : base()
+        public BluetoothCallback(ITrackingButtonsHandler trackingButtonsHandler, Activity activity) : base()
         {
             _trackingButtonsHandler = trackingButtonsHandler;
+            _activity = activity;
+        }
+
+        public override void OnDeviceFound(IntentSender intentSender)
+        {
+            base.OnDeviceFound(intentSender);
+            
         }
 
         public override void OnAssociationPending(IntentSender intentSender)
         {
             base.OnAssociationPending(intentSender);
+            _activity.StartIntentSenderForResult(intentSender, SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0);
         }
 
         public override void OnAssociationCreated(AssociationInfo associationInfo)
@@ -42,6 +51,8 @@ public class MainActivity : MauiAppCompatActivity
 
     private readonly IServiceManager _serviceManager;
 
+    private const int SELECT_DEVICE_REQUEST_CODE = 0;
+
     public MainActivity() : base()
     {
         _serviceManager = ServiceHelper.Services.GetService<IServiceManager>();
@@ -51,12 +62,12 @@ public class MainActivity : MauiAppCompatActivity
     private void OnServiceStart(object? sender, EventArgs e)
     {
         var deviceManager = (CompanionDeviceManager) GetSystemService(CompanionDeviceService)!;
-
+        
         var deviceFilter = new BluetoothDeviceFilter.Builder();
         var pairingRequest = new AssociationRequest.Builder();
             //.AddDeviceFilter(deviceFilter.Build());
 
-        deviceManager.Associate(pairingRequest.Build(), new BluetoothCallback((ITrackingButtonsHandler)Shell.Current.CurrentPage), null);
+        deviceManager.Associate(pairingRequest.Build(), new BluetoothCallback((ITrackingButtonsHandler)Shell.Current.CurrentPage, this), null);
     }
 
     protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
