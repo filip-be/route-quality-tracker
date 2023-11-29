@@ -26,14 +26,20 @@ public class MainActivity : MauiAppCompatActivity
 
         public override void OnDeviceFound(IntentSender intentSender)
         {
-            base.OnDeviceFound(intentSender);
-            
+            if (!OperatingSystem.IsAndroidVersionAtLeast(33))
+            {
+                base.OnDeviceFound(intentSender);
+                _activity.StartIntentSenderForResult(intentSender, SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0);
+            }
         }
 
         public override void OnAssociationPending(IntentSender intentSender)
         {
-            base.OnAssociationPending(intentSender);
-            _activity.StartIntentSenderForResult(intentSender, SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0);
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
+            {
+                base.OnAssociationPending(intentSender);
+                _activity.StartIntentSenderForResult(intentSender, SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0);
+            }
         }
 
         public override void OnAssociationCreated(AssociationInfo associationInfo)
@@ -55,7 +61,7 @@ public class MainActivity : MauiAppCompatActivity
 
     public MainActivity() : base()
     {
-        _serviceManager = ServiceHelper.Services.GetService<IServiceManager>();
+        _serviceManager = ServiceHelper.Services.GetService<IServiceManager>()!;
         _serviceManager.OnServiceStart += OnServiceStart;
     }
 
@@ -63,11 +69,12 @@ public class MainActivity : MauiAppCompatActivity
     {
         var deviceManager = (CompanionDeviceManager) GetSystemService(CompanionDeviceService)!;
         
-        var deviceFilter = new BluetoothDeviceFilter.Builder();
-        var pairingRequest = new AssociationRequest.Builder();
-            //.AddDeviceFilter(deviceFilter.Build());
+        var deviceFilter = new BluetoothLeDeviceFilter.Builder();
+        var pairingRequest = new AssociationRequest.Builder()
+            .AddDeviceFilter(deviceFilter.Build());
 
         deviceManager.Associate(pairingRequest.Build(), new BluetoothCallback((ITrackingButtonsHandler)Shell.Current.CurrentPage, this), null);
+        
     }
 
     protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
@@ -75,7 +82,7 @@ public class MainActivity : MauiAppCompatActivity
         if(resultCode != Result.Ok) {
             return;
         }
-        if (requestCode == 1)
+        if (requestCode == SELECT_DEVICE_REQUEST_CODE)
         {
             if (resultCode == Result.Ok && data != null)
             {
