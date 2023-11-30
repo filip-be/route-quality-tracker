@@ -6,6 +6,7 @@ using Android.Content.PM;
 using Android.Views;
 using Java.Lang;
 using RouteQualityTracker.Interfaces;
+using RouteQualityTracker.Platforms.Android;
 using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker;
@@ -63,19 +64,46 @@ public class MainActivity : MauiAppCompatActivity
     {
         _serviceManager = ServiceHelper.Services.GetService<IServiceManager>()!;
         _serviceManager.OnServiceStart += OnServiceStart;
+        _serviceManager.OnServiceStop += OnServiceStop;
+    }
+
+    private void OnServiceStop(object? sender, EventArgs e)
+    {
+        var intent = new Intent(this, typeof(MediaButtonHandlerService));
+        
+        StopService(intent);
     }
 
     private void OnServiceStart(object? sender, EventArgs e)
     {
-        var deviceManager = (CompanionDeviceManager) GetSystemService(CompanionDeviceService)!;
-        
-        var deviceFilter = new BluetoothLeDeviceFilter.Builder();
-        var pairingRequest = new AssociationRequest.Builder()
-            .AddDeviceFilter(deviceFilter.Build());
+        var intent = new Intent(this, typeof(MediaButtonHandlerService));
+        intent.PutExtra("inputExtra", "Foreground Service Example in Android");
 
-        deviceManager.Associate(pairingRequest.Build(), new BluetoothCallback((ITrackingButtonsHandler)Shell.Current.CurrentPage, this), null);
+        try
+        {
+            //var xx = StartService(intent);
+            var xx = StartForegroundService(intent);
+        }
+        catch(Java.Lang.Exception ex)
+        {
+            (Shell.Current.CurrentPage as ITrackingButtonsHandler).OnButtonClick(ex.Message);
+        }
+        catch(System.Exception ex)
+        {
+            (Shell.Current.CurrentPage as ITrackingButtonsHandler).OnButtonClick(ex.Message);
+        }
         
     }
+    //private void OnServiceStart(object? sender, EventArgs e)
+    //{
+    //    var deviceManager = (CompanionDeviceManager) GetSystemService(CompanionDeviceService)!;
+
+    //    var deviceFilter = new BluetoothLeDeviceFilter.Builder();
+    //    var pairingRequest = new AssociationRequest.Builder()
+    //        .AddDeviceFilter(deviceFilter.Build());
+
+    //    deviceManager.Associate(pairingRequest.Build(), new BluetoothCallback((ITrackingButtonsHandler)Shell.Current.CurrentPage, this), null);
+    //}
 
     protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
     {
@@ -106,9 +134,10 @@ public class MainActivity : MauiAppCompatActivity
     public override bool OnKeyDown(Keycode keyCode, KeyEvent? e)
     {
         var page = Shell.Current.CurrentPage;
-        if (page is ITrackingButtonsHandler handler &&
-            keyCode is >= Keycode.Num0 and <= Keycode.Num9)
+        //KeyCode.Headsethook
+        if (page is ITrackingButtonsHandler handler)
         {
+            System.Diagnostics.Debug.WriteLine($"Button clicked: {keyCode}");
             handler.OnButtonClick(keyCode.ToString());
             return true;
         }
