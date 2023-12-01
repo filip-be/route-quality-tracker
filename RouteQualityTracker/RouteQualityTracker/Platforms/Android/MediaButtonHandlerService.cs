@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Media;
 using Android.OS;
 using Android.Runtime;
 using AndroidX.Core.App;
@@ -8,7 +9,6 @@ using AndroidX.Core.App;
 namespace RouteQualityTracker.Platforms.Android;
 
 [Service(ForegroundServiceType = ForegroundService.TypeMediaPlayback, Exported = true)]
-[IntentFilter(new[] { Intent.ActionMediaButton })]
 public class MediaButtonHandlerService : Service
 {
     private const string ChannelId = "MediaButtonHandlerServiceChannel";
@@ -43,6 +43,20 @@ public class MediaButtonHandlerService : Service
     [return: GeneratedEnum]
     public override StartCommandResult OnStartCommand(Intent? intent, [GeneratedEnum] StartCommandFlags flags, int startId)
     {
+
+        var playIntent = new Intent(this, typeof(MediaButtonReceiver))
+            .SetAction(Intent.ActionMediaButton);
+        
+        var pendingIntent = PendingIntent.GetBroadcast(
+            this,
+            0,
+            playIntent,
+            PendingIntentFlags.Immutable
+        );
+
+        (GetSystemService(AudioService) as AudioManager)!.RegisterMediaButtonEventReceiver(pendingIntent);
+
+
         var input = intent!.GetStringExtra("inputExtra");
 
         var notificationBuilder = new NotificationCompat
@@ -52,7 +66,8 @@ public class MediaButtonHandlerService : Service
             .SetSmallIcon(Resource.Mipmap.appicon)
             .SetContentTitle("Foreground Service")
             .SetContentText(input)
-            .AddAction(GenerateActionCompat(this, Microsoft.Maui.Resource.Drawable.ic_call_decline, "Switch", Intent.ActionMediaButton));
+            .AddAction(Microsoft.Maui.Resource.Drawable.ic_call_decline, "Switch", pendingIntent);
+            //.AddAction(GenerateActionCompat(this, Microsoft.Maui.Resource.Drawable.ic_call_decline, "Switch", Intent.ActionMediaButton));
 
         if (OperatingSystem.IsAndroidVersionAtLeast(29))
         {
