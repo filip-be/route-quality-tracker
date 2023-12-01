@@ -1,16 +1,19 @@
 ﻿using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using AndroidX.Core.App;
-using static Android.Renderscripts.ScriptGroup;
 
 namespace RouteQualityTracker.Platforms.Android;
 
-[Service]
+[Service(ForegroundServiceType = ForegroundService.TypeMediaPlayback, Exported = true)]
+[IntentFilter(new[] { Intent.ActionMediaButton })]
 public class MediaButtonHandlerService : Service
 {
-    private const string CHANNEL_ID = "MediaButtonHandlerServiceChannel";
+    private const string ChannelId = "MediaButtonHandlerServiceChannel";
+    private const int NotificationId = 1000;
+    private const string NotificationChannelName = "Media button handler service";
 
     public override void OnCreate()
     {
@@ -19,23 +22,47 @@ public class MediaButtonHandlerService : Service
         CreateNotificationChannel();
     }
 
+    internal static NotificationCompat.Action GenerateActionCompat(Context context, int icon, string title, string intentAction)
+    {
+        Intent intent = new Intent(context, typeof(MediaButtonHandlerService));
+        intent.SetAction(intentAction);
+
+        PendingIntentFlags flags = PendingIntentFlags.UpdateCurrent;
+        //if (intentAction.Equals(MediaPlayerService.ActionStop))
+        //{
+        //    flags = PendingIntentFlags.CancelCurrent;
+        //}
+
+        flags |= PendingIntentFlags.Mutable;
+
+        PendingIntent pendingIntent = PendingIntent.GetService(context, 1, intent, flags);
+
+        return new NotificationCompat.Action.Builder(icon, title, pendingIntent).Build();
+    }
+
     [return: GeneratedEnum]
     public override StartCommandResult OnStartCommand(Intent? intent, [GeneratedEnum] StartCommandFlags flags, int startId)
     {
         var input = intent!.GetStringExtra("inputExtra");
-        var notificationIntent = new Intent(this, typeof(MainActivity));
-        var pendingIntent = PendingIntent.GetActivity(this, 0, notificationIntent, PendingIntentFlags.Immutable);
 
-        var notification = new NotificationCompat
-            .Builder(this, CHANNEL_ID)
-                .SetContentTitle("Foreground Service")
-                .SetContentText(input)
-                .SetSmallIcon(Resource.Drawable.material_ic_keyboard_arrow_next_black_24dp)
-                //.SetSmallIcon(R.drawable.ic_stat_name)
-                .SetContentIntent(pendingIntent)
-                .Build();
+        var notificationBuilder = new NotificationCompat
+                .Builder(this, ChannelId)
+            .SetAutoCancel(false)
+            .SetOngoing(true)
+            .SetSmallIcon(Resource.Mipmap.appicon)
+            .SetContentTitle("Foreground Service")
+            .SetContentText(input)
+            .AddAction(GenerateActionCompat(this, Microsoft.Maui.Resource.Drawable.ic_call_decline, "Switch", Intent.ActionMediaButton));
 
-        StartForeground(1, notification);
+        if (OperatingSystem.IsAndroidVersionAtLeast(29))
+        {
+            StartForeground(NotificationId, notificationBuilder.Build(), ForegroundService.TypeMediaPlayback);
+        }
+        else
+        {
+            StartForeground(NotificationId, notificationBuilder.Build());
+        }
+
 
         return StartCommandResult.NotSticky;
     }
@@ -43,22 +70,17 @@ public class MediaButtonHandlerService : Service
     private void CreateNotificationChannel()
     {
         var serviceChannel = new NotificationChannel(
-                CHANNEL_ID,
-                "Foreground Service Channel",
-                NotificationImportance.Default
+                ChannelId,
+                NotificationChannelName,
+                NotificationImportance.Low
         );
 
-        var manager = GetSystemService(Context.NotificationService) as NotificationManager;
-        manager.CreateNotificationChannel(serviceChannel);
-    }
-
-    public override void OnDestroy()
-    {
-        base.OnDestroy();
+        var manager = GetSystemService(NotificationService) as NotificationManager;
+        manager!.CreateNotificationChannel(serviceChannel);
     }
 
     public override IBinder? OnBind(Intent? intent)
     {
-        throw new NotImplementedException();
+        return null;
     }
 }

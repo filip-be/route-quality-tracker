@@ -92,7 +92,6 @@ public class MainActivity : MauiAppCompatActivity
         {
             (Shell.Current.CurrentPage as ITrackingButtonsHandler).OnButtonClick(ex.Message);
         }
-        
     }
     //private void OnServiceStart(object? sender, EventArgs e)
     //{
