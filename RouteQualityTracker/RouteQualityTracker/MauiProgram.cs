@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Services;
+using RouteQualityTracker.Pages;
 
 namespace RouteQualityTracker;
 
@@ -20,6 +21,7 @@ public static class MauiProgram
             });
 
         builder.Services.AddSingleton<MainPage>();
+        builder.Services.AddSingleton<SettingsPage>();
         builder.Services.AddSingleton<IServiceManager, ServiceManager>();
         builder.Services.AddSingleton<IQualityTrackingService, QualityTrackingService>();
 

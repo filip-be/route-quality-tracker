@@ -18,7 +18,7 @@ public class MediaButtonHandlerHandlerService : Service
 {
     private const string ChannelId = "MediaButtonHandlerServiceChannel";
     private const int NotificationId = 1000;
-    private const string NotificationChannelName = "Media button handler handlerService";
+    private const string NotificationChannelName = "Media button handler service";
     private const string MediaSessionName = "MediaButtonHandlerSession";
 
     private NotificationManager NotificationManager => (NotificationManager)GetSystemService(NotificationService)!;

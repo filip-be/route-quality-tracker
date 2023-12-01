@@ -2,13 +2,10 @@
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Storage;
 using RouteQualityTracker.Core.Interfaces;
-using RouteQualityTracker.Core.Services;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using RouteQualityTracker.Core.Models;
 
-namespace RouteQualityTracker;
+namespace RouteQualityTracker.Pages;
 
 public partial class MainPage : ContentPage
 {

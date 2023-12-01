@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RouteQualityTracker.Pages.SettingsPage">
+    <VerticalStackLayout Padding="30" Spacing="10">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Label Text="Send email notifications" VerticalOptions="Center" Grid.Column="0"/>
+            <Switch x:Name="sendEmailsSwitch" IsToggled="False" Grid.Column="1"/>
+        </Grid>
+
+        <BoxView HeightRequest="1" Color="LightGray" />
+
+        <Label Text="Email" />
+        <Entry 
+            x:Name="emailEntry"
+            BindingContext="{x:Reference sendEmails}"
+            IsEnabled="{Binding IsToggled}" />
+        
+        <Label Text="Password" />
+        <Entry 
+            x:Name="passwordEntry"
+            IsPassword="True"
+            BindingContext="{x:Reference sendEmails}"
+            IsEnabled="{Binding IsToggled}" />
+        
+        <Label Text="SMTP server" />
+        <Entry 
+            x:Name="smtpServerEntry"
+            BindingContext="{x:Reference sendEmails}"
+            IsEnabled="{Binding IsToggled}" />
+
+        <Label Text="SMTP port" />
+        <Entry 
+            x:Name="smtpPortEntry"
+            BindingContext="{x:Reference sendEmails}"
+            IsEnabled="{Binding IsToggled}" />
+
+        <Button
+            Text="Save changes"
+            Clicked="OnSaveSettings"
+            BindingContext="{x:Reference sendEmails}"
+            IsEnabled="{Binding IsToggled}" />
+    </VerticalStackLayout>
+</ContentPage>
