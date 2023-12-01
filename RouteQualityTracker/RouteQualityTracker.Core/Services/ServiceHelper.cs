@@ -1,4 +1,6 @@
-﻿namespace RouteQualityTracker.Services;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace RouteQualityTracker.Core.Services;
 
 public static class ServiceHelper
 {

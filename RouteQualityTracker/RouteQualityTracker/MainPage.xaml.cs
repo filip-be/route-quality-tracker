@@ -1,23 +1,50 @@
-﻿using RouteQualityTracker.Interfaces;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
+using RouteQualityTracker.Core.Interfaces;
+using RouteQualityTracker.Core.Services;
 
 namespace RouteQualityTracker;
 
-public partial class MainPage : ContentPage, ITrackingButtonsHandler
+public partial class MainPage : ContentPage
 {
-    private readonly IServiceManager _foregroundService;
+    private readonly IServiceManager _serviceManager;
+    private readonly IQualityTrackingService _qualityTrackingService;
     private int _count;
 
-    public MainPage(IServiceManager foregroundService)
+    public MainPage(IServiceManager serviceManager, IQualityTrackingService qualityTrackingService)
     {
-        _foregroundService = foregroundService;
         InitializeComponent();
+
+        _serviceManager = serviceManager;
+        _qualityTrackingService = qualityTrackingService;
+        _serviceManager.OnServiceStarted += OnServiceStarted;
+        _serviceManager.OnServiceStopped += OnServiceStopped;
+        _serviceManager.OnServiceStartError += OnServiceStartError;
+    }
+
+    private void OnServiceStartError(object? sender, Exception ex)
+    {
+        ToggleServiceBtn.Text = "Start service";
+        Toast.Make($"Error starting service: {ex.Message}", ToastDuration.Long);
+    }
+
+    private void OnServiceStopped(object? sender, EventArgs e)
+    {
+        ToggleServiceBtn.Text = "Start service";
+        _qualityTrackingService.StopTracking();
+        Toast.Make("Service stopped");
+    }
+
+    private void OnServiceStarted(object? sender, EventArgs e)
+    {
+        ToggleServiceBtn.Text = "Stop service";
+        _qualityTrackingService.StartTracking();
+        Toast.Make("Service started");
     }
 
     private void OnToggleServiceClicked(object sender, EventArgs e)
     {
-        var isRunning = _foregroundService.ToggleService();
-
-        ToggleServiceBtn.Text = isRunning ? "Stop service" : "Start service";
+        _serviceManager.ToggleService();
     }
 
     private void OnCounterClicked(object sender, EventArgs e)
@@ -30,10 +57,5 @@ public partial class MainPage : ContentPage, ITrackingButtonsHandler
             CounterBtn.Text = $"Clicked {_count} times";
 
         SemanticScreenReader.Announce(CounterBtn.Text);
-    }
-
-    public void OnButtonClick(string text)
-    {
-        CounterBtn.Text = text;
     }
 }

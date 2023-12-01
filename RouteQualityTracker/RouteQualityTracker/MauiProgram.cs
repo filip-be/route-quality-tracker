@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using RouteQualityTracker.Interfaces;
-using RouteQualityTracker.Services;
+﻿using CommunityToolkit.Maui;
+using Microsoft.Extensions.Logging;
+using RouteQualityTracker.Core.Interfaces;
+using RouteQualityTracker.Core.Services;
 
 namespace RouteQualityTracker;
 
@@ -11,6 +12,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -19,6 +21,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<MainPage>();
         builder.Services.AddSingleton<IServiceManager, ServiceManager>();
+        builder.Services.AddSingleton<IQualityTrackingService, QualityTrackingService>();
 
 #if ANDROID
         builder.Services.AddSingleton<MainActivity>();

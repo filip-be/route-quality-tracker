@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteQualityTracker", "RouteQualityTracker\RouteQualityTracker.csproj", "{1B3241AA-E97C-463C-A3D6-3C19F4A1C810}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RouteQualityTracker", "RouteQualityTracker\RouteQualityTracker.csproj", "{1B3241AA-E97C-463C-A3D6-3C19F4A1C810}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteQualityTracker.Tests", "RouteQualityTracker.Tests\RouteQualityTracker.Tests.csproj", "{BCABDC59-BD00-4EE4-A21E-EDB7F073F52D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteQualityTracker.Core", "RouteQualityTracker.Core\RouteQualityTracker.Core.csproj", "{6C2978CB-1931-4932-B796-C3E6C9E9AB5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,6 +21,14 @@ Global
 		{1B3241AA-E97C-463C-A3D6-3C19F4A1C810}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B3241AA-E97C-463C-A3D6-3C19F4A1C810}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1B3241AA-E97C-463C-A3D6-3C19F4A1C810}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{BCABDC59-BD00-4EE4-A21E-EDB7F073F52D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCABDC59-BD00-4EE4-A21E-EDB7F073F52D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCABDC59-BD00-4EE4-A21E-EDB7F073F52D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCABDC59-BD00-4EE4-A21E-EDB7F073F52D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C2978CB-1931-4932-B796-C3E6C9E9AB5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C2978CB-1931-4932-B796-C3E6C9E9AB5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C2978CB-1931-4932-B796-C3E6C9E9AB5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C2978CB-1931-4932-B796-C3E6C9E9AB5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
