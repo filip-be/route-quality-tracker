@@ -6,8 +6,8 @@ using Android.Media.Session;
 using Android.OS;
 using Android.Runtime;
 using AndroidX.Core.App;
-using RouteQualityTracker.Core.Enums;
 using RouteQualityTracker.Core.Interfaces;
+using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
 
 namespace RouteQualityTracker.Platforms.Android;
@@ -34,9 +34,9 @@ public class MediaButtonHandlerHandlerService : Service
         qualityTrackerService.OnRouteQualityChanged += OnRouteQualityChanged;
     }
 
-    private void OnRouteQualityChanged(object? sender, RouteQuality routeQuality)
+    private void OnRouteQualityChanged(object? sender, RouteQualityEnum routeQualityEnum)
     {
-        var notification = CreateActivityNotification($"Route quality: {routeQuality}");
+        var notification = CreateActivityNotification($"Route quality: {routeQualityEnum}");
         NotificationManager.Notify(NotificationId, notification);
     }
 

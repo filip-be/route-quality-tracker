@@ -1,4 +1,4 @@
-﻿using RouteQualityTracker.Core.Enums;
+﻿using RouteQualityTracker.Core.Models;
 
 namespace RouteQualityTracker.Core.Interfaces;
 
@@ -10,7 +10,9 @@ public interface IQualityTrackingService
 
     void ToggleRouteQuality();
 
-    RouteQuality GetCurrentRouteQuality();
+    RouteQualityEnum GetCurrentRouteQuality();
 
-    event EventHandler<RouteQuality> OnRouteQualityChanged;
+    event EventHandler<RouteQualityEnum> OnRouteQualityChanged;
+
+    IList<RouteQualityRecord> GetRouteQualityRecords();
 }

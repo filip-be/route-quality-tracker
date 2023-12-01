@@ -1,7 +1,12 @@
 ﻿using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Maui.Storage;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Services;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
+using RouteQualityTracker.Core.Models;
 
 namespace RouteQualityTracker;
 
@@ -9,7 +14,6 @@ public partial class MainPage : ContentPage
 {
     private readonly IServiceManager _serviceManager;
     private readonly IQualityTrackingService _qualityTrackingService;
-    private int _count;
 
     public MainPage(IServiceManager serviceManager, IQualityTrackingService qualityTrackingService)
     {
@@ -25,21 +29,25 @@ public partial class MainPage : ContentPage
     private void OnServiceStartError(object? sender, Exception ex)
     {
         ToggleServiceBtn.Text = "Start service";
-        Toast.Make($"Error starting service: {ex.Message}", ToastDuration.Long);
+        Toast.Make($"Error starting service: {ex.Message}", ToastDuration.Long).Show();
     }
 
     private void OnServiceStopped(object? sender, EventArgs e)
     {
         ToggleServiceBtn.Text = "Start service";
         _qualityTrackingService.StopTracking();
-        Toast.Make("Service stopped");
+
+        SaveDataBtn.IsEnabled = true;
+        Toast.Make("Service stopped").Show();
     }
 
     private void OnServiceStarted(object? sender, EventArgs e)
     {
         ToggleServiceBtn.Text = "Stop service";
         _qualityTrackingService.StartTracking();
-        Toast.Make("Service started");
+
+        SaveDataBtn.IsEnabled = false;
+        Toast.Make("Service started").Show();
     }
 
     private void OnToggleServiceClicked(object sender, EventArgs e)
@@ -47,15 +55,23 @@ public partial class MainPage : ContentPage
         _serviceManager.ToggleService();
     }
 
-    private void OnCounterClicked(object sender, EventArgs e)
+    private async void OnSaveClicked(object sender, EventArgs e)
     {
-        _count++;
+        var routeQualityRecords = _qualityTrackingService.GetRouteQualityRecords();
 
-        if (_count == 1)
-            CounterBtn.Text = $"Clicked {_count} time";
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        var jsonString = JsonSerializer.Serialize(routeQualityRecords, options);
+
+        var fileName = $"RouteQuality-{DateTime.Today.ToString("yyyy-MM-dd")}.json";
+        using var stream = new MemoryStream(Encoding.Default.GetBytes(jsonString));
+        var fileSaverResult = await FileSaver.Default.SaveAsync(fileName, stream);
+        if (fileSaverResult.IsSuccessful)
+        {
+            await Toast.Make($"The file was saved successfully to location: {fileSaverResult.FilePath}").Show();
+        }
         else
-            CounterBtn.Text = $"Clicked {_count} times";
-
-        SemanticScreenReader.Announce(CounterBtn.Text);
+        {
+            await Toast.Make($"The file was not saved successfully with error: {fileSaverResult.Exception.Message}").Show();
+        }
     }
 }

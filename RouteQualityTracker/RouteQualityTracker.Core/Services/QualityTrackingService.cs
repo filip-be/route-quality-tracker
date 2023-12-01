@@ -1,49 +1,69 @@
-﻿using RouteQualityTracker.Core.Enums;
-using RouteQualityTracker.Core.Interfaces;
+﻿using RouteQualityTracker.Core.Interfaces;
+using RouteQualityTracker.Core.Models;
 
 namespace RouteQualityTracker.Core.Services;
 
 public class QualityTrackingService : IQualityTrackingService
 {
-    private RouteQuality _currentRouteQuality = RouteQuality.Unknown;
+    private RouteQualityEnum _currentRouteQualityEnum = RouteQualityEnum.Unknown;
     private bool _isQualityIncreasing;
 
+    private IList<RouteQualityRecord> _routeQualityData = new List<RouteQualityRecord>();
+
+    public QualityTrackingService()
+    {
+        OnRouteQualityChanged += OnRouteQualityChangedInternal;
+    }
+
+    private void OnRouteQualityChangedInternal(object? sender, RouteQualityEnum e)
+    {
+        _routeQualityData.Add(new RouteQualityRecord
+        {
+            Date = DateTime.UtcNow,
+            RouteQuality =_currentRouteQualityEnum
+        });
+    }
 
     public void StartTracking()
     {
-        _currentRouteQuality = RouteQuality.Standard;
+        _routeQualityData.Clear();
+        _currentRouteQualityEnum = RouteQualityEnum.Standard;
         _isQualityIncreasing = true;
-        OnRouteQualityChanged?.Invoke(this, _currentRouteQuality);
+        OnRouteQualityChanged?.Invoke(this, _currentRouteQualityEnum);
     }
 
     public void StopTracking()
     {
-        _currentRouteQuality = RouteQuality.Unknown;
+        _currentRouteQualityEnum = RouteQualityEnum.Unknown;
     }
 
     public void ToggleRouteQuality()
     {
-        switch (_currentRouteQuality)
+        switch (_currentRouteQualityEnum)
         {
-            case RouteQuality.Bad:
-                _currentRouteQuality = RouteQuality.Standard;
+            case RouteQualityEnum.Bad:
+                _currentRouteQualityEnum = RouteQualityEnum.Standard;
                 _isQualityIncreasing = true;
                 break;
-            case RouteQuality.Standard:
-                _currentRouteQuality = _isQualityIncreasing ? RouteQuality.Good : RouteQuality.Bad;
+            case RouteQualityEnum.Standard:
+                _currentRouteQualityEnum = _isQualityIncreasing ? RouteQualityEnum.Good : RouteQualityEnum.Bad;
                 break;
-            case RouteQuality.Good:
-                _currentRouteQuality = RouteQuality.Standard;
+            case RouteQualityEnum.Good:
+                _currentRouteQualityEnum = RouteQualityEnum.Standard;
                 _isQualityIncreasing = false;
                 break;
         }
-        OnRouteQualityChanged?.Invoke(this, _currentRouteQuality);
+        OnRouteQualityChanged?.Invoke(this, _currentRouteQualityEnum);
     }
 
-    public RouteQuality GetCurrentRouteQuality()
+    public RouteQualityEnum GetCurrentRouteQuality()
     {
-        return _currentRouteQuality;
+        return _currentRouteQualityEnum;
+    }
+    public IList<RouteQualityRecord> GetRouteQualityRecords()
+    {
+        return _routeQualityData;
     }
 
-    public event EventHandler<RouteQuality>? OnRouteQualityChanged;
+    public event EventHandler<RouteQualityEnum>? OnRouteQualityChanged;
 }
