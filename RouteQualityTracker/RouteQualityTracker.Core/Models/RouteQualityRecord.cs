@@ -2,7 +2,7 @@
 
 public class RouteQualityRecord
 {
-    public DateTime Date { get; set; }
+    public DateTimeOffset Date { get; set; }
     public RouteQualityEnum RouteQuality { get; set; }
 }
 

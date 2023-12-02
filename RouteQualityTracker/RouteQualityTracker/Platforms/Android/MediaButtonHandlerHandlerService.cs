@@ -5,6 +5,7 @@ using Android.Content.PM;
 using Android.Media.Session;
 using Android.OS;
 using Android.Runtime;
+using Android.Telephony;
 using AndroidX.Core.App;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
@@ -26,18 +27,34 @@ public class MediaButtonHandlerHandlerService : Service
     private MediaSession? _mediaSession;
 
     private readonly IServiceManager _serviceManager;
+    private readonly NotificationSettings _notificationSettings;
 
     public MediaButtonHandlerHandlerService()
     {
         _serviceManager = ServiceHelper.Services.GetService<IServiceManager>()!;
+        _notificationSettings = ServiceHelper.Services.GetService<NotificationSettings>()!;
         var qualityTrackerService = ServiceHelper.Services.GetService<IQualityTrackingService>()!;
         qualityTrackerService.OnRouteQualityChanged += OnRouteQualityChanged;
     }
 
     private void OnRouteQualityChanged(object? sender, RouteQualityEnum routeQualityEnum)
     {
-        var notification = CreateActivityNotification($"Route quality: {routeQualityEnum}");
+        var text = $"Route quality: {routeQualityEnum}";
+        var notification = CreateActivityNotification(text);
         NotificationManager.Notify(NotificationId, notification);
+
+        if (_notificationSettings.SendSms)
+        {
+            try
+            {
+                var manager = SmsManager.Default;
+                manager.SendTextMessage(_notificationSettings.SmsNumber, null, text, null, null);
+            }
+            catch (Exception ex)
+            {
+                _serviceManager.SetStatus(false, ex);
+            }
+        }
     }
 
     public override void OnCreate()
@@ -84,7 +101,7 @@ public class MediaButtonHandlerHandlerService : Service
                 NotificationChannelName,
                 NotificationImportance.Low
         );
-        
+
         NotificationManager.CreateNotificationChannel(serviceChannel);
     }
 

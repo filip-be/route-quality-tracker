@@ -25,7 +25,6 @@ public partial class MainPage : ContentPage
 
     private void OnServiceStartError(object? sender, Exception ex)
     {
-        ToggleServiceBtn.Text = "Start service";
         Toast.Make($"Error starting service: {ex.Message}", ToastDuration.Long).Show();
     }
 

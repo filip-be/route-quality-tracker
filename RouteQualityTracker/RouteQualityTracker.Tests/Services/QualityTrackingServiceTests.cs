@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
@@ -10,7 +11,25 @@ namespace RouteQualityTracker.Tests.Services;
 [TestFixture]
 public class QualityTrackingServiceTests
 {
-    private IQualityTrackingService GetService => new QualityTrackingService();
+    private Mock<TimeProvider> _timePoviderFake;
+    private Mock<INotificationService> _notificationServiceFake;
+
+    private IQualityTrackingService GetService => 
+        new QualityTrackingService(_timePoviderFake.Object, _notificationServiceFake.Object);
+
+    [SetUp]
+    public void SetUp()
+    {
+        _notificationServiceFake = new Mock<INotificationService>();
+        _timePoviderFake = new Mock<TimeProvider>();
+        SetupCurrentDate(new DateTimeOffset());
+    }
+
+    private void SetupCurrentDate(DateTimeOffset date)
+    {
+        _timePoviderFake.Reset();
+        _timePoviderFake.Setup(x => x.GetUtcNow()).Returns(date);
+    }
 
     [Test]
     public void DefaultRouteQuality_IsUnknown()
@@ -48,6 +67,21 @@ public class QualityTrackingServiceTests
     }
 
     [Test]
+    public void Start_Saves_CurrentDate_ToEvents()
+    {
+        var expectedDate = new DateTimeOffset(2023, 12, 01, 00, 00, 00, TimeSpan.Zero);
+        SetupCurrentDate(expectedDate);
+
+        var service = GetService;
+
+        service.StartTracking();
+
+        var records = service.GetRouteQualityRecords();
+
+        records.Single().Date.Should().Be(expectedDate);
+    }
+
+    [Test]
     public void RouteQuality_AfterStop_IsUnknown()
     {
         var service = GetService;
@@ -61,7 +95,7 @@ public class QualityTrackingServiceTests
     }
 
     [Test]
-    public void RouteQuality_Toggle_IteratesOverQuality()
+    public void Toggle_IteratesOverQuality()
     {
         var service = GetService;
 
@@ -87,7 +121,7 @@ public class QualityTrackingServiceTests
     }
 
     [Test]
-    public void RouteQuality_Toggle_TriggersEvent()
+    public void Toggle_TriggersEvent()
     {
         var service = GetService;
         RouteQualityEnum? routeQuality = null;
@@ -105,7 +139,7 @@ public class QualityTrackingServiceTests
     }
 
     [Test]
-    public void RouteQuality_Toggle_AddsRouteQualityRecord()
+    public void Toggle_AddsRouteQualityRecord()
     {
         var service = GetService;
 
@@ -113,5 +147,27 @@ public class QualityTrackingServiceTests
         service.ToggleRouteQuality();
 
         service.GetRouteQualityRecords().Count.Should().Be(2);
+    }
+
+    [Test]
+    public void QualityChange_DoNot_SendEmail_IfNotificationDisabled()
+    {
+        _notificationServiceFake.SetupGet(x => x.IsSendEmailEnabled).Returns(false);
+
+        var service = GetService;
+        service.StartTracking();
+
+        _notificationServiceFake.Verify(x => x.SendEmail(It.IsAny<RouteQualityEnum>()), Times.Never());
+    }
+
+    [Test]
+    public void QualityChange_SendEmail_IfNotificationEnabled()
+    {
+        _notificationServiceFake.SetupGet(x => x.IsSendEmailEnabled).Returns(true);
+
+        var service = GetService;
+        service.StartTracking();
+
+        _notificationServiceFake.Verify(x => x.SendEmail(It.IsAny<RouteQualityEnum>()), Times.Once());
     }
 }
