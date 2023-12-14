@@ -15,6 +15,11 @@ public partial class SettingsPage : ContentPage
     public const string SentToPasswordProp = "SentToPassword";
     public const string SendToSmtpServerProp = "SendToSmtpServer";
     public const string SentToSmtpPortProp = "SentToSmtpPort";
+    public const string UseHeadsetProp = "UseHeadset";
+    public const string UseMediaControlsProp = "UseMediaControls";
+
+    public const string ChevronUpIcon = "chevron_up.png";
+    public const string ChevronDownIcon = "chevron_down.png";
 
     private readonly NotificationSettings _notificationSettings;
 
@@ -27,6 +32,8 @@ public partial class SettingsPage : ContentPage
 
     private void UpdateNotificationSettings()
     {
+        _notificationSettings.UseHeadset = Preferences.Default.Get(UseHeadsetProp, false);
+        _notificationSettings.UseMediaControls = Preferences.Default.Get(UseMediaControlsProp, false);
         _notificationSettings.SendSms = Preferences.Default.Get(SendSmsProp, false);
         _notificationSettings.SmsNumber = Preferences.Default.Get(SendSmsNumberProp, string.Empty);
         _notificationSettings.SendEmail = Preferences.Default.Get(SendEmailsProp, false);
@@ -41,6 +48,8 @@ public partial class SettingsPage : ContentPage
     {
         UpdateNotificationSettings();
 
+        useHeadset.IsToggled = _notificationSettings.UseHeadset;
+        useMediaControls.IsToggled = _notificationSettings.UseMediaControls;
         sendSmsSwitch.IsToggled = _notificationSettings.SendSms;
         smsNumber.Text = _notificationSettings.SmsNumber;
         sendEmailsSwitch.IsToggled = _notificationSettings.SendEmail;
@@ -50,6 +59,8 @@ public partial class SettingsPage : ContentPage
         smtpServerEntry.Text = _notificationSettings.SmtpServer;
         smtpPortEntry.Text = _notificationSettings.SmtpPort.ToString();
 
+        useHeadset.IsEnabled = true;
+        useMediaControls.IsEnabled = true;
         sendSmsSwitch.IsEnabled = true;
         sendEmailsSwitch.IsEnabled = true;
 
@@ -58,6 +69,8 @@ public partial class SettingsPage : ContentPage
 
     private async void OnSaveSettings(object sender, EventArgs e)
     {
+        Preferences.Default.Set(UseHeadsetProp, useHeadset.IsToggled);
+        Preferences.Default.Set(UseMediaControlsProp, useMediaControls.IsToggled);
         Preferences.Default.Set(SendSmsProp, sendSmsSwitch.IsToggled);
         Preferences.Default.Set(SendSmsNumberProp, smsNumber.Text);
         Preferences.Default.Set(SendEmailsProp, sendEmailsSwitch.IsToggled);
@@ -72,5 +85,17 @@ public partial class SettingsPage : ContentPage
         UpdateNotificationSettings();
 
         await Toast.Make("Settings saved").Show();
+    }
+
+    private void NotificationsExpandedChanged(object sender, CommunityToolkit.Maui.Core.ExpandedChangedEventArgs e)
+    {
+        notificationExpanderIcon.Source = e.IsExpanded ? ImageSource.FromFile(ChevronUpIcon) : ImageSource.FromFile(ChevronDownIcon);
+        notificationDivider.IsVisible = e.IsExpanded;
+    }
+
+    private void InputExpandedChanged(object sender, CommunityToolkit.Maui.Core.ExpandedChangedEventArgs e)
+    {
+        inputExpanderIcon.Source = e.IsExpanded ? ImageSource.FromFile(ChevronUpIcon) : ImageSource.FromFile(ChevronDownIcon);
+        inputDivider.IsVisible = e.IsExpanded;
     }
 }

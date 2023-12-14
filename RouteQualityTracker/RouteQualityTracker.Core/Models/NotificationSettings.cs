@@ -23,4 +23,8 @@ public class NotificationSettings
     public string SmtpServer { get; set; }
 
     public int SmtpPort { get; set; }
+
+    public bool UseHeadset { get; set; }
+
+    public bool UseMediaControls { get; set; }
 }

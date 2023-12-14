@@ -2,83 +2,175 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RouteQualityTracker.Pages.SettingsPage"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Name="self">
-    <VerticalStackLayout Padding="30" Spacing="10" ScaleY="0.5">
-        <Button x:Name="loadSettingsBtn"
-                IsEnabled="True"
-                Text="Load settings"
-                BackgroundColor="LightCyan"
-                TextColor="Black"
-                Clicked="OnLoadSettings" />
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="10">
+            <Button x:Name="loadSettingsBtn"
+                    IsEnabled="True"
+                    Text="Load settings"
+                    BackgroundColor="{StaticResource PrimaryDark}"
+                    TextColor="Black"
+                    Clicked="OnLoadSettings" />
 
-        <Button
-            Text="Save changes"
-            Clicked="OnSaveSettings" />
+            <Button
+                Text="Save changes"
+                Clicked="OnSaveSettings" />
 
-        <BoxView HeightRequest="1" Color="LightGray" />
+            <BoxView HeightRequest="1" Color="LightGray" />
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Label Text="Send SMS notifications" VerticalOptions="Center" Grid.Column="0"/>
-            <Switch x:Name="sendSmsSwitch"
-                    IsEnabled="False"
-                    IsToggled="False"
-                    Grid.Column="1"/>
-        </Grid>
+            <toolkit:Expander ExpandedChanged="InputExpandedChanged">
+                <toolkit:Expander.Header>
+                    <VerticalStackLayout>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <Label 
+                                Text="Input" 
+                                FontSize="Medium"
+                                VerticalOptions="Center" 
+                                Grid.Column="0"/>
 
-        <Label Text="To (SMS)" />
-        <Entry 
-            x:Name="smsNumber"
-            Keyboard="Telephone"
-            IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+                            <Image
+                                x:Name="inputExpanderIcon"
+                                Source="chevron_down.png"
+                                Aspect="AspectFit"
+                                SemanticProperties.Description="expand"
+                                Grid.Column="1"/>
+                        </Grid>
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="200" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Label Text="Send email notifications" VerticalOptions="Center" Grid.Column="0"/>
-            <Switch x:Name="sendEmailsSwitch"
-                    IsEnabled="False"
-                    IsToggled="False"
-                    Grid.Column="1"/>
-        </Grid>
+                        <BoxView 
+                            x:Name="inputDivider"
+                            IsVisible="false"
+                            Margin="0, 10"
+                            HeightRequest="1" 
+                            Color="LightGray"/>
+                    </VerticalStackLayout>
+                </toolkit:Expander.Header>
+                <VerticalStackLayout Padding="10" Spacing="5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="50"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Text="Use headset" VerticalOptions="Center" Grid.Column="0"/>
+                        <Switch x:Name="useHeadset"
+                                IsEnabled="False"
+                                IsToggled="False"
+                                Grid.Column="1"/>
 
-        <BoxView HeightRequest="1" Color="LightGray" />
 
-        <Label Text="To (Email)" />
-        <Entry 
-            x:Name="toEntry"
-            Keyboard="Email"
-            IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+                        <Label Text="Use media controls" VerticalOptions="Center" Grid.Column="0" Grid.Row="1"/>
+                        <Switch x:Name="useMediaControls"
+                                IsEnabled="False"
+                                IsToggled="False"
+                                Grid.Column="1"
+                                Grid.Row="1"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </toolkit:Expander>
+            
+            <BoxView HeightRequest="1" Color="LightGray" />
 
-        <Label Text="Username" />
-        <Entry 
-            x:Name="usernameEntry"
-            IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
-        
-        <Label Text="Password" />
-        <Entry 
-            x:Name="passwordEntry"
-            IsPassword="True"
-            IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
-        
-        <Label Text="SMTP server" />
-        <Entry 
-            x:Name="smtpServerEntry"
-            IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+            <toolkit:Expander ExpandedChanged="NotificationsExpandedChanged">
+                <toolkit:Expander.Header>
+                    <VerticalStackLayout>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <Label 
+                                Text="Notifications" 
+                                FontSize="Medium"
+                                VerticalOptions="Center" 
+                                Grid.Column="0"/>
 
-        <Label Text="SMTP port" />
-        <Entry 
-            x:Name="smtpPortEntry"
-            Keyboard="Numeric"
-            IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+                            <Image
+                                x:Name="notificationExpanderIcon"
+                                Source="chevron_down.png"
+                                Aspect="AspectFit"
+                                SemanticProperties.Description="expand"
+                                Grid.Column="1"/>
+                        </Grid>
 
-        <Button
-            Text="Save changes"
-            Clicked="OnSaveSettings" />
-    </VerticalStackLayout>
+                        <BoxView 
+                            x:Name="notificationDivider"
+                            IsVisible="false"
+                            Margin="0, 10"
+                            HeightRequest="1" 
+                            Color="LightGray"/>
+                    </VerticalStackLayout>
+                </toolkit:Expander.Header>
+
+                <VerticalStackLayout Padding="10" Spacing="5">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="50"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Text="Send SMS notifications" VerticalOptions="Center" Grid.Column="0"/>
+                        <Switch x:Name="sendSmsSwitch"
+                                IsEnabled="False"
+                                IsToggled="False"
+                                Grid.Column="1"/>
+                    </Grid>
+
+                    <Label Text="To (SMS)" />
+                    <Entry 
+                        x:Name="smsNumber"
+                        Keyboard="Telephone"
+                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="50"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Text="Send email notifications" VerticalOptions="Center" Grid.Column="0"/>
+                        <Switch x:Name="sendEmailsSwitch"
+                                IsEnabled="False"
+                                IsToggled="False"
+                                Grid.Column="1"/>
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="LightGray" />
+
+                    <Label Text="To (Email)" />
+                    <Entry 
+                        x:Name="toEntry"
+                        Keyboard="Email"
+                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+
+                    <Label Text="Username" />
+                    <Entry 
+                        x:Name="usernameEntry"
+                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+
+                    <Label Text="Password" />
+                    <Entry 
+                        x:Name="passwordEntry"
+                        IsPassword="True"
+                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+
+                    <Label Text="SMTP server" />
+                    <Entry 
+                        x:Name="smtpServerEntry"
+                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+
+                    <Label Text="SMTP port" />
+                    <Entry 
+                        x:Name="smtpPortEntry"
+                        Keyboard="Numeric"
+                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+                </VerticalStackLayout>
+            </toolkit:Expander>
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
