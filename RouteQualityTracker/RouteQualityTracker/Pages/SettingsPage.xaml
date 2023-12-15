@@ -128,7 +128,7 @@
                     <Entry 
                         x:Name="smsNumber"
                         Keyboard="Telephone"
-                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+                        IsEnabled="{Binding Source={x:Reference sendSmsSwitch}, Path=IsToggled}" />
 
                     <Grid>
                         <Grid.ColumnDefinitions>
