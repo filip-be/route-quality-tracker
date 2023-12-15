@@ -1,27 +1,27 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="RouteQualityTracker.Pages.MainPage">
+             x:Class="RouteQualityTracker.Pages.MainPage"
+             IconImageSource="house_solid.svg">
     <ScrollView>
         <VerticalStackLayout
             Padding="30,0"
             Spacing="25">
             <Image
-                Source="dotnet_bot.png"
-                HeightRequest="185"
-                Aspect="AspectFit"
-                SemanticProperties.Description="dot net bot in a race car number eight" />
+                Source="compass.svg"
+                HeightRequest="50"
+                SemanticProperties.Description="compass" />
 
             <Label
-                Text="Hello, World!"
+                Text="Hello!"
                 Style="{StaticResource Headline}"
                 SemanticProperties.HeadingLevel="Level1" />
 
             <Label
-                Text="Welcome to &#10;.NET Multi-platform App UI"
+                Text="Welcome to &#10;Route Quality Tracker"
                 Style="{StaticResource SubHeadline}"
                 SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
+                SemanticProperties.Description="Welcome to Route Quality Tracker" />
 
             <Button
                 x:Name="ToggleServiceBtn"

@@ -6,18 +6,15 @@
     xmlns:pages="clr-namespace:RouteQualityTracker.Pages"
     Shell.FlyoutBehavior="Flyout"
     Title="RouteQualityTracker">
-
     <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate pages:MainPage}"
         Route="MainPage"
-        Icon="house_solid.svg"
         FlyoutIcon="house_solid.svg"/>
 
     <ShellContent
         Title="Settings"
         ContentTemplate="{DataTemplate pages:SettingsPage}"
         Route="Settings"
-        Icon="gear_solid.svg"
-        FlyoutIcon="gear_solid.svg"/>
+        Icon="gear_solid.svg"/>
 </Shell>

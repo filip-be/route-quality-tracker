@@ -37,7 +37,7 @@
                                 x:Name="inputExpanderIcon"
                                 Source="chevron_down.png"
                                 Aspect="AspectFit"
-                                SemanticProperties.Description="expand"
+                                SemanticProperties.Description="expand/collapse"
                                 Grid.Column="1"/>
                         </Grid>
 
@@ -98,7 +98,7 @@
                                 x:Name="notificationExpanderIcon"
                                 Source="chevron_down.png"
                                 Aspect="AspectFit"
-                                SemanticProperties.Description="expand"
+                                SemanticProperties.Description="expand/collapse"
                                 Grid.Column="1"/>
                         </Grid>
 
