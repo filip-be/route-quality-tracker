@@ -1,88 +1,77 @@
 using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Views;
 using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
+using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker.Pages;
 
 public partial class SettingsPage : ContentPage
 {
-    public const string SendSmsProp = "SendSms";
-    public const string SendSmsNumberProp = "SendSmsNumber";
-    public const string SendEmailsProp = "SendEmails";
-    public const string SendFromEmailProp = "SendFromEmail";
-    public const string SendToEmailProp = "SendToEmail";
-    public const string SentToPasswordProp = "SentToPassword";
-    public const string SendToSmtpServerProp = "SendToSmtpServer";
-    public const string SentToSmtpPortProp = "SentToSmtpPort";
-    public const string UseHeadsetProp = "UseHeadset";
-    public const string UseMediaControlsProp = "UseMediaControls";
-
     public const string ChevronUpIcon = "chevron_up.png";
     public const string ChevronDownIcon = "chevron_down.png";
 
-    private readonly NotificationSettings _notificationSettings;
+    private readonly ISettingsService _settingsService;
 
     public SettingsPage()
     {
         InitializeComponent();
-        _notificationSettings = ServiceHelper.GetService<NotificationSettings>();
-        UpdateNotificationSettings();
+        _settingsService = ServiceHelper.GetService<ISettingsService>();
     }
 
-    private void UpdateNotificationSettings()
+    protected override void OnAppearing()
     {
-        _notificationSettings.UseHeadset = Preferences.Default.Get(UseHeadsetProp, false);
-        _notificationSettings.UseMediaControls = Preferences.Default.Get(UseMediaControlsProp, false);
-        _notificationSettings.SendSms = Preferences.Default.Get(SendSmsProp, false);
-        _notificationSettings.SmsNumber = Preferences.Default.Get(SendSmsNumberProp, string.Empty);
-        _notificationSettings.SendEmail = Preferences.Default.Get(SendEmailsProp, false);
-        _notificationSettings.MailTo = Preferences.Default.Get(SendToEmailProp, string.Empty);
-        _notificationSettings.Username = Preferences.Default.Get(SendFromEmailProp, string.Empty);
-        _notificationSettings.Password = Preferences.Default.Get(SentToPasswordProp, string.Empty);
-        _notificationSettings.SmtpServer = Preferences.Default.Get(SendToSmtpServerProp, string.Empty);
-        _notificationSettings.SmtpPort = Preferences.Default.Get(SentToSmtpPortProp, 0);
+        if (!useHeadset.IsEnabled)
+        {
+            LoadSettings();
+
+            useHeadset.IsEnabled = true;
+            useMediaControls.IsEnabled = true;
+            sendSmsSwitch.IsEnabled = true;
+            sendEmailsSwitch.IsEnabled = true;
+        }
+        base.OnAppearing();
     }
 
     private async void OnLoadSettings(object sender, EventArgs e)
     {
-        UpdateNotificationSettings();
-
-        useHeadset.IsToggled = _notificationSettings.UseHeadset;
-        useMediaControls.IsToggled = _notificationSettings.UseMediaControls;
-        sendSmsSwitch.IsToggled = _notificationSettings.SendSms;
-        smsNumber.Text = _notificationSettings.SmsNumber;
-        sendEmailsSwitch.IsToggled = _notificationSettings.SendEmail;
-        toEntry.Text = _notificationSettings.MailTo;
-        usernameEntry.Text = _notificationSettings.Username;
-        passwordEntry.Text = _notificationSettings.Password;
-        smtpServerEntry.Text = _notificationSettings.SmtpServer;
-        smtpPortEntry.Text = _notificationSettings.SmtpPort.ToString();
-
-        useHeadset.IsEnabled = true;
-        useMediaControls.IsEnabled = true;
-        sendSmsSwitch.IsEnabled = true;
-        sendEmailsSwitch.IsEnabled = true;
+        LoadSettings();
 
         await Toast.Make("Settings loaded").Show();
     }
 
+    private void LoadSettings()
+    {
+        useHeadset.IsToggled = _settingsService.Settings.UseHeadset;
+        useMediaControls.IsToggled = _settingsService.Settings.UseMediaControls;
+        sendSmsSwitch.IsToggled = _settingsService.Settings.SendSms;
+        smsNumber.Text = _settingsService.Settings.SmsNumber;
+        sendEmailsSwitch.IsToggled = _settingsService.Settings.SendEmail;
+        toEntry.Text = _settingsService.Settings.MailTo;
+        usernameEntry.Text = _settingsService.Settings.Username;
+        passwordEntry.Text = _settingsService.Settings.Password;
+        smtpServerEntry.Text = _settingsService.Settings.SmtpServer;
+        smtpPortEntry.Text = _settingsService.Settings.SmtpPort.ToString();
+    }
+
     private async void OnSaveSettings(object sender, EventArgs e)
     {
-        Preferences.Default.Set(UseHeadsetProp, useHeadset.IsToggled);
-        Preferences.Default.Set(UseMediaControlsProp, useMediaControls.IsToggled);
-        Preferences.Default.Set(SendSmsProp, sendSmsSwitch.IsToggled);
-        Preferences.Default.Set(SendSmsNumberProp, smsNumber.Text);
-        Preferences.Default.Set(SendEmailsProp, sendEmailsSwitch.IsToggled);
-        Preferences.Default.Set(SendToEmailProp, toEntry.Text);
-        Preferences.Default.Set(SendFromEmailProp, usernameEntry.Text);
-        Preferences.Default.Set(SentToPasswordProp, passwordEntry.Text);
-        Preferences.Default.Set(SendToSmtpServerProp, smtpServerEntry.Text);
-
         _ = int.TryParse(smtpPortEntry.Text, out int smtpPort);
-        Preferences.Default.Set(SentToSmtpPortProp, smtpPort);
 
-        UpdateNotificationSettings();
+        var newSettings = new AppSettings
+        {
+            UseHeadset = useHeadset.IsToggled,
+            UseMediaControls = useMediaControls.IsToggled,
+            SendSms = sendSmsSwitch.IsToggled,
+            SmsNumber = smsNumber.Text,
+            SendEmail = sendEmailsSwitch.IsToggled,
+            MailTo = toEntry.Text,
+            Username = usernameEntry.Text,
+            Password = passwordEntry.Text,
+            SmtpServer = smtpServerEntry.Text,
+            SmtpPort = smtpPort
+        };
+
+        _settingsService.UpdateSettings(newSettings);
 
         await Toast.Make("Settings saved").Show();
     }

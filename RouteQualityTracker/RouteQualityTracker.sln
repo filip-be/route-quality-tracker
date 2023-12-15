@@ -5,9 +5,14 @@ VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RouteQualityTracker", "RouteQualityTracker\RouteQualityTracker.csproj", "{1B3241AA-E97C-463C-A3D6-3C19F4A1C810}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteQualityTracker.Tests", "RouteQualityTracker.Tests\RouteQualityTracker.Tests.csproj", "{BCABDC59-BD00-4EE4-A21E-EDB7F073F52D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RouteQualityTracker.Tests", "RouteQualityTracker.Tests\RouteQualityTracker.Tests.csproj", "{BCABDC59-BD00-4EE4-A21E-EDB7F073F52D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RouteQualityTracker.Core", "RouteQualityTracker.Core\RouteQualityTracker.Core.csproj", "{6C2978CB-1931-4932-B796-C3E6C9E9AB5B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RouteQualityTracker.Core", "RouteQualityTracker.Core\RouteQualityTracker.Core.csproj", "{6C2978CB-1931-4932-B796-C3E6C9E9AB5B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1480A1A3-CFD2-4568-AB39-2C4F417BE1A9}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

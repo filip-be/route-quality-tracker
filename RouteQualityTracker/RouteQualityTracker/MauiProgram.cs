@@ -4,6 +4,7 @@ using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
 using RouteQualityTracker.Pages;
+using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker;
 
@@ -24,7 +25,8 @@ public static class MauiProgram
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddSingleton<MainPage>();
         builder.Services.AddSingleton<SettingsPage>();
-        builder.Services.AddSingleton<NotificationSettings>();
+        builder.Services.AddSingleton<AppSettings>();
+        builder.Services.AddSingleton<ISettingsService, SettingsService>();
         builder.Services.AddSingleton<IServiceManager, ServiceManager>();
         builder.Services.AddSingleton<IQualityTrackingService, QualityTrackingService>();
 

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace RouteQualityTracker.Core.Models;
 
-namespace RouteQualityTracker.Core.Models;
-
-public class NotificationSettings
+public class AppSettings
 {
     public bool SendEmail { get; set; }
 

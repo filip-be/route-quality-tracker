@@ -8,7 +8,7 @@
         <VerticalStackLayout Padding="30" Spacing="10">
             <Button x:Name="loadSettingsBtn"
                     IsEnabled="True"
-                    Text="Load settings"
+                    Text="Reload settings"
                     BackgroundColor="{StaticResource PrimaryDark}"
                     TextColor="Black"
                     Clicked="OnLoadSettings" />

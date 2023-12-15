@@ -7,24 +7,24 @@ namespace RouteQualityTracker.Core.Services;
 
 public class NotificationService : INotificationService
 {
-    private readonly NotificationSettings _notificationSettings;
+    private readonly AppSettings _appSettings;
     private readonly IServiceManager _serviceManager;
 
-    public NotificationService(NotificationSettings notificationSettings, IServiceManager serviceManager)
+    public NotificationService(AppSettings appSettings, IServiceManager serviceManager)
     {
-        _notificationSettings = notificationSettings;
+        _appSettings = appSettings;
         _serviceManager = serviceManager;
     }
 
-    public bool IsSendEmailEnabled => _notificationSettings.SendEmail;
+    public bool IsSendEmailEnabled => _appSettings.SendEmail;
 
     public async Task SendEmail(RouteQualityEnum routeQuality)
     {
-        using var smtpClient = new SmtpClient(_notificationSettings.SmtpServer, _notificationSettings.SmtpPort);
+        using var smtpClient = new SmtpClient(_appSettings.SmtpServer, _appSettings.SmtpPort);
         smtpClient.EnableSsl = true;
-        smtpClient.Credentials = new NetworkCredential(_notificationSettings.Username, _notificationSettings.Password);
+        smtpClient.Credentials = new NetworkCredential(_appSettings.Username, _appSettings.Password);
 
-        var mail = new MailMessage(_notificationSettings.Username, _notificationSettings.MailTo)
+        var mail = new MailMessage(_appSettings.Username, _appSettings.MailTo)
         {
             Subject = $"Route quality: {routeQuality}",
             Body = string.Empty

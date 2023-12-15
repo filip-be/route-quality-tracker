@@ -10,6 +10,7 @@ using AndroidX.Core.App;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
+using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker.Platforms.Android;
 
@@ -27,12 +28,12 @@ public class MediaButtonHandlerHandlerService : Service
     private MediaSession? _mediaSession;
 
     private readonly IServiceManager _serviceManager;
-    private readonly NotificationSettings _notificationSettings;
+    private readonly ISettingsService _settingsService;
 
     public MediaButtonHandlerHandlerService()
     {
         _serviceManager = ServiceHelper.Services.GetService<IServiceManager>()!;
-        _notificationSettings = ServiceHelper.Services.GetService<NotificationSettings>()!;
+        _settingsService = ServiceHelper.Services.GetService<ISettingsService>()!;
         var qualityTrackerService = ServiceHelper.Services.GetService<IQualityTrackingService>()!;
         qualityTrackerService.OnRouteQualityChanged += OnRouteQualityChanged;
     }
@@ -43,12 +44,12 @@ public class MediaButtonHandlerHandlerService : Service
         var notification = CreateActivityNotification(text);
         NotificationManager.Notify(NotificationId, notification);
 
-        if (_notificationSettings.SendSms)
+        if (_settingsService.Settings.SendSms)
         {
             try
             {
-                var manager = SmsManager.Default;
-                manager.SendTextMessage(_notificationSettings.SmsNumber, null, text, null, null);
+                var manager = SmsManager.Default!;
+                manager.SendTextMessage(_settingsService.Settings.SmsNumber, null, text, null, null);
             }
             catch (Exception ex)
             {
