@@ -61,6 +61,7 @@
                         </Grid.ColumnDefinitions>
                         <Label Text="Use headset" VerticalOptions="Center" Grid.Column="0"/>
                         <Switch x:Name="useHeadset"
+                                Toggled="OnUseHeadsetToggled"
                                 IsEnabled="False"
                                 IsToggled="False"
                                 Grid.Column="1"/>
@@ -68,6 +69,7 @@
 
                         <Label Text="Use media controls" VerticalOptions="Center" Grid.Column="0" Grid.Row="1"/>
                         <Switch x:Name="useMediaControls"
+                                Toggled="OnUseMediaControlsToggled"
                                 IsEnabled="False"
                                 IsToggled="False"
                                 Grid.Column="1"

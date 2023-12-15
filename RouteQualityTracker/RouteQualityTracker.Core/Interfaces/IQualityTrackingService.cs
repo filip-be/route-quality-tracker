@@ -10,6 +10,8 @@ public interface IQualityTrackingService
 
     void ToggleRouteQuality();
 
+    void SetRouteQuality(RouteQualityEnum quality);
+
     RouteQualityEnum GetCurrentRouteQuality();
 
     event EventHandler<RouteQualityEnum> OnRouteQualityChanged;

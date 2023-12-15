@@ -87,4 +87,20 @@ public partial class SettingsPage : ContentPage
         inputExpanderIcon.Source = e.IsExpanded ? ImageSource.FromFile(ChevronUpIcon) : ImageSource.FromFile(ChevronDownIcon);
         inputDivider.IsVisible = e.IsExpanded;
     }
+    
+    private void OnUseHeadsetToggled(object sender, ToggledEventArgs e)
+    {
+        if (e.Value)
+        {
+            useMediaControls.IsToggled = false;
+        }
+    }
+
+    private void OnUseMediaControlsToggled(object sender, ToggledEventArgs e)
+    {
+        if (e.Value)
+        {
+            useHeadset.IsToggled = false;
+        }
+    }
 }

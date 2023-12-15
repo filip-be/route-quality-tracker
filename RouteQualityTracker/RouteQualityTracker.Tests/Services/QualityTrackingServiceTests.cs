@@ -170,4 +170,34 @@ public class QualityTrackingServiceTests
 
         _notificationServiceFake.Verify(x => x.SendEmail(It.IsAny<RouteQualityEnum>()), Times.Once());
     }
+
+    [TestCase(RouteQualityEnum.Bad)]
+    [TestCase(RouteQualityEnum.Standard)]
+    [TestCase(RouteQualityEnum.Good)]
+    public void SetRouteQuality_ChangesQuality(RouteQualityEnum routeQuality)
+    {
+        var service = GetService;
+
+        service.StartTracking();
+        service.SetRouteQuality(routeQuality);
+
+        service.GetCurrentRouteQuality().Should().Be(routeQuality);
+    }
+
+    [Test]
+    public void SetRouteQuality_TriggersQualityChangedAction()
+    {
+        var service = GetService;
+        RouteQualityEnum? routeQuality = null;
+
+        service.OnRouteQualityChanged += (_, quality) =>
+        {
+            routeQuality = quality;
+        };
+
+        service.StartTracking();
+        service.SetRouteQuality(RouteQualityEnum.Bad);
+
+        routeQuality.Should().Be(RouteQualityEnum.Bad);
+    }
 }

@@ -66,6 +66,12 @@ public class QualityTrackingService : IQualityTrackingService
         OnRouteQualityChanged?.Invoke(this, _currentRouteQuality);
     }
 
+    public void SetRouteQuality(RouteQualityEnum quality)
+    {
+        _currentRouteQuality = quality;
+        OnRouteQualityChanged?.Invoke(this, _currentRouteQuality);
+    }
+
     public RouteQualityEnum GetCurrentRouteQuality()
     {
         return _currentRouteQuality;
