@@ -4,7 +4,7 @@ namespace RouteQualityTracker.Core.Services;
 
 public class ServiceManager : IServiceManager
 {
-    private bool IsServiceRunning { get; set; }
+    internal bool IsServiceRunning { get; set; }
 
     public void ToggleService()
     {
