@@ -5,5 +5,5 @@ namespace RouteQualityTracker.Core.Interfaces;
 
 public interface ITrackAnalyzer
 {
-    XmlDocument MarkupTrack(Stream input, IList<RouteQualityRecord> records);
+    Task<XmlDocument> MarkupTrack(Stream input, IList<RouteQualityRecord> records);
 }

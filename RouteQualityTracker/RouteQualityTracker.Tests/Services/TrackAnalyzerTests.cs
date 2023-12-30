@@ -19,7 +19,7 @@ public class TrackAnalyzerTests
     }
 
     [Test]
-    public void MarkupTrack_Throws_WhenTrack_HasNoGpxTag()
+    public async Task MarkupTrack_Throws_WhenTrack_HasNoGpxTag()
     {
         var inputDocument = """
             <?xml version='1.0' encoding='UTF-8'?>
@@ -30,13 +30,13 @@ public class TrackAnalyzerTests
 
         var qualityPoints = new List<RouteQualityRecord> { new() };
 
-        Action act = () => _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
+        Func<Task> act = async () => { await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints); };
 
-        act.Should().Throw<InvalidOperationException>();
+        await act.Should().ThrowAsync<InvalidOperationException>();
     }
 
     [Test]
-    public void MarkupTrack_Throws_WhenTrack_HasNoTrackPoints()
+    public async Task MarkupTrack_Throws_WhenTrack_HasNoTrackPoints()
     {
         var inputDocument = """
             <?xml version='1.0' encoding='UTF-8'?>
@@ -62,14 +62,14 @@ public class TrackAnalyzerTests
         using var inputStream = new MemoryStream(inputBytes);
 
         var qualityPoints = new List<RouteQualityRecord> { new() };
+                
+        Func<Task> act = async () => { await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints); };
 
-        Action act = () => _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
-
-        act.Should().Throw<InvalidDataException>();
+        await act.Should().ThrowAsync<InvalidDataException>();
     }
 
     [Test]
-    public void MarkupTrack_Throws_WhenQualityData_IsFromAnotherDay()
+    public async Task MarkupTrack_Throws_WhenQualityData_IsFromAnotherDay()
     {
         var inputDocument = """
             <?xml version='1.0' encoding='UTF-8'?>
@@ -111,8 +111,8 @@ public class TrackAnalyzerTests
             }
         };
 
-        Action act = () => _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
+        Func<Task> act = async () => { await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints); };
 
-        act.Should().Throw<InvalidDataException>();
+        await act.Should().ThrowAsync<InvalidDataException>();
     }
 }
