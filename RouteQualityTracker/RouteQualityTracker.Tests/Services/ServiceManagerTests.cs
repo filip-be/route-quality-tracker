@@ -5,6 +5,7 @@ using RouteQualityTracker.Core.Services;
 
 namespace RouteQualityTracker.Tests.Services;
 
+[TestFixture]
 public class ServiceManagerTests
 {
     private IServiceManager _serviceManager;
