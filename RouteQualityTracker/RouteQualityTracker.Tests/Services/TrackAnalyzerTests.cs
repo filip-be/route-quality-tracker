@@ -65,7 +65,7 @@ public class TrackAnalyzerTests
 
         Action act = () => _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
 
-        act.Should().Throw<InvalidOperationException>();
+        act.Should().Throw<InvalidDataException>();
     }
 
     [Test]
@@ -113,6 +113,6 @@ public class TrackAnalyzerTests
 
         Action act = () => _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
 
-        act.Should().Throw<InvalidOperationException>();
+        act.Should().Throw<InvalidDataException>();
     }
 }
