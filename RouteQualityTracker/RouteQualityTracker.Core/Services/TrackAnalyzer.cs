@@ -11,7 +11,7 @@ public class TrackAnalyzer : ITrackAnalyzer
     {
         if (!await GpxData.CanRead(input))
         {
-            throw new InvalidOperationException("stream is not valid GPX file");
+            throw new InvalidOperationException("unsupported file format");
         }
 
         var gpxData = new GpxData(input);

@@ -44,6 +44,9 @@ public class GpxData
         var reader = XmlReader.Create(input, settings);
         await reader.MoveToContentAsync();
 
-        return reader.NamespaceURI is "http://www.topografix.com/GPX/1/0" or "http://www.topografix.com/GPX/1/1";
+        var contentNamespace = reader.NamespaceURI;
+
+        input.Position = 0;
+        return contentNamespace is "http://www.topografix.com/GPX/1/0" or "http://www.topografix.com/GPX/1/1";
     }
 }
