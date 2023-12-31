@@ -1,7 +1,6 @@
 ﻿using RouteQualityTracker.Core.Gpx;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
-using System.Xml;
 
 namespace RouteQualityTracker.Core.Services;
 
@@ -39,6 +38,8 @@ public class TrackAnalyzer : ITrackAnalyzer
         {
             throw new InvalidDataException("quality tracking data doesn't match GPX data");
         }
+
+
 
         return gpxData;
     }
