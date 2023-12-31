@@ -1,16 +1,18 @@
-﻿using System.Xml.Linq;
+﻿using System.Xml;
+using System.Xml.Linq;
 
 namespace RouteQualityTracker.Core.Gpx;
 
 public class GpxWaypoint
 {
-    private XElement _gpxElement;
+    private readonly XElement _gpxElement;
+    private readonly XNamespace _gpxNamespace;
 
     public DateTimeOffset? TimeUtc
     {
         get
         {
-            var timeElement = _gpxElement.Element("time");
+            var timeElement = _gpxElement.Element(_gpxNamespace + "time");
 
             if (DateTimeOffset.TryParse(timeElement?.Value ?? string.Empty, out var time))
             {
@@ -20,8 +22,9 @@ public class GpxWaypoint
         }
     }
 
-    public GpxWaypoint(XElement node)
+    public GpxWaypoint(XElement node, XNamespace gpxNamespace)
     {
         _gpxElement = node;
+        _gpxNamespace = gpxNamespace;
     }
 }

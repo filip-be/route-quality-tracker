@@ -5,37 +5,51 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace RouteQualityTracker.Core.Gpx;
 
 public class GpxData
 {
-    private XmlDocument _gpxData;
+    private XDocument _gpxData;
+    private XmlNamespaceManager _gpxNamespaceManager;
+    private XNamespace _gpxNamespace;
 
     public IEnumerable<GpxWaypoint>? Waypoints
     {
         get
         {
-            var nodes = _gpxData.SelectNodes("/gpx/trk/trkseg/trkpt");
+            var nodes = _gpxData.XPathSelectElements("//gpx:trkpt", _gpxNamespaceManager);
 
             if (nodes is null) return null;
 
             var waypoints = new List<GpxWaypoint>();
-            foreach(XElement node in nodes)
+            foreach(var node in nodes)
             {
-                waypoints.Add(new GpxWaypoint(node));
+                waypoints.Add(new GpxWaypoint(node, _gpxNamespace));
             }
             return waypoints;
         }
     }
 
-    public GpxData(Stream input)
+    public async Task Load(Stream input)
     {
-        _gpxData = new XmlDocument();
-        _gpxData.Load(input);
+        var gpxNamespace = await GetXmlNamespace(input);
+        _gpxNamespace = gpxNamespace;
+
+        _gpxData = XDocument.Load(input);
+
+        _gpxNamespaceManager = new XmlNamespaceManager(new NameTable());
+        _gpxNamespaceManager.AddNamespace("gpx", gpxNamespace);
     }
 
     public static async Task<bool> CanRead(Stream input)
+    {
+        var contentNamespace = await GetXmlNamespace(input);  
+        return contentNamespace is "http://www.topografix.com/GPX/1/0" or "http://www.topografix.com/GPX/1/1";
+    }
+
+    private static async Task<string> GetXmlNamespace(Stream input)
     {
         var settings = new XmlReaderSettings
         {
@@ -47,6 +61,7 @@ public class GpxData
         var contentNamespace = reader.NamespaceURI;
 
         input.Position = 0;
-        return contentNamespace is "http://www.topografix.com/GPX/1/0" or "http://www.topografix.com/GPX/1/1";
+
+        return contentNamespace;
     }
 }
