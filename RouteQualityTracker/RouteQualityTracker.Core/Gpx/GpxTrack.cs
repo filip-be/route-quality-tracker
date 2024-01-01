@@ -8,15 +8,13 @@ namespace RouteQualityTracker.Core.Gpx;
 public class GpxTrack
 {
     private readonly XElement _gpxElement;
-    private readonly XNamespace _gpxNamespace;
-    private readonly XmlNamespaceManager _gpxNamespaceManager;
-    private const string NamespacePrefix = "gpx";
+    private readonly string _gpxNamespace;
 
     public TrackColor? Color
     {
         get
         {
-            var colorElement = _gpxElement.XPathSelectElement($"/{NamespacePrefix}:extensions/color", _gpxNamespaceManager);
+            var colorElement = _gpxElement.SelectGpxElement($"extensions/color", _gpxNamespace);
             var colorValue = colorElement?.Value;
             
             if (Enum.TryParse<TrackColor>(colorValue, true, out var color))
@@ -27,12 +25,26 @@ public class GpxTrack
         }
     }
 
-    public GpxTrack(XElement node, XNamespace gpxNamespace)
+    public DateTimeOffset? StartTime 
+    {   get
+        {
+            return null;
+        }
+    }
+
+    public GpxTrack(XElement node, string gpxNamespace)
     {
         _gpxElement = node;
         _gpxNamespace = gpxNamespace;
+    }
 
-        _gpxNamespaceManager = new XmlNamespaceManager(new NameTable());
-        _gpxNamespaceManager.AddNamespace(NamespacePrefix, gpxNamespace.ToString());
+    public void RemoveFromParent()
+    {
+        _gpxElement.Remove();
+    }
+
+    public XElement ToXElement()
+    {
+        return _gpxElement;
     }
 }

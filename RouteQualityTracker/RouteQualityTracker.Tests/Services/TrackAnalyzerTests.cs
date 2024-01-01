@@ -161,6 +161,7 @@ public class TrackAnalyzerTests
 
         var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
 
+        result.Tracks.Count().Should().Be(3);
         result.Tracks[0].Color.Should().Be(TrackColor.Bad);
         result.Tracks[1].Color.Should().Be(TrackColor.Standard);
         result.Tracks[2].Color.Should().Be(TrackColor.Good);
@@ -201,6 +202,7 @@ public class TrackAnalyzerTests
     }
 
     // Match records to points (before/after, etc.)[Test]
+    [Test]
     public async Task MarkupTrack_MatchesRecordsToTrackPoints()
     {
         var firstTrackStart = new DateTime(2023, 12, 16, 09, 10, 0);

@@ -39,8 +39,19 @@ public class TrackAnalyzer : ITrackAnalyzer
             throw new InvalidDataException("quality tracking data doesn't match GPX data");
         }
 
-
+        var tracks = SplitTracks(gpxData.Tracks, waypoints, records);
+        gpxData.Tracks = tracks;
 
         return gpxData;
+    }
+
+    private IList<GpxTrack> SplitTracks(IList<GpxTrack> tracks, IList<GpxWaypoint> waypoints, IList<RouteQualityRecord> records)
+    {
+
+
+        var originalTrack = tracks.First();
+
+
+        return null;
     }
 }

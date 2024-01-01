@@ -12,8 +12,7 @@ namespace RouteQualityTracker.Core.Gpx;
 public class GpxData
 {
     private XDocument _gpxData;
-    private XmlNamespaceManager _gpxNamespaceManager;
-    private XNamespace _gpxNamespace;
+    private string _gpxNamespace;
 
     private const string NamespacePrefix = "gpx";
 
@@ -21,30 +20,22 @@ public class GpxData
     {
         get
         {
-            return GetGpxElements<GpxWaypoint>("trkpt");
+            return _gpxData.Root.SelectGpxElements<GpxWaypoint>("//trkpt", _gpxNamespace);
         }
     }
     public IList<GpxTrack>? Tracks
     {
         get
         {
-            return GetGpxElements<GpxTrack>("trk");
+            return _gpxData.Root.SelectGpxElements<GpxTrack>("//trk", _gpxNamespace);
         }
-    }
-
-    private IList<T>? GetGpxElements<T>(string path)
-    {
-        var nodes = _gpxData.XPathSelectElements($"//{NamespacePrefix}:{path}", _gpxNamespaceManager);
-
-        if (nodes is null) return null;
-
-        var elements = new List<T>();
-        foreach (var node in nodes)
+        set
         {
-            var element = (T) Activator.CreateInstance(typeof(T), new object[] { node, _gpxNamespace })!;
-            elements.Add(element);
+            var oldTracks = _gpxData.Root.SelectGpxElements<GpxTrack>("//trk", _gpxNamespace);
+            oldTracks!.ForEach(t => t.RemoveFromParent());
+
+            value?.ToList().ForEach(t => _gpxData.Add(t.ToXElement()));
         }
-        return elements;
     }
 
     public async Task Load(Stream input)
@@ -53,9 +44,6 @@ public class GpxData
         _gpxNamespace = gpxNamespace;
 
         _gpxData = XDocument.Load(input);
-
-        _gpxNamespaceManager = new XmlNamespaceManager(new NameTable());
-        _gpxNamespaceManager.AddNamespace(NamespacePrefix, gpxNamespace);
     }
 
     public static async Task<bool> CanRead(Stream input)

@@ -6,13 +6,13 @@ namespace RouteQualityTracker.Core.Gpx;
 public class GpxWaypoint
 {
     private readonly XElement _gpxElement;
-    private readonly XNamespace _gpxNamespace;
+    private readonly string _gpxNamespace;
 
     public DateTimeOffset? TimeUtc
     {
         get
         {
-            var timeElement = _gpxElement.Element(_gpxNamespace + "time");
+            var timeElement = _gpxElement.GpxElement("time", _gpxNamespace);
 
             if (DateTimeOffset.TryParse(timeElement?.Value ?? string.Empty, out var time))
             {
@@ -22,7 +22,7 @@ public class GpxWaypoint
         }
     }
 
-    public GpxWaypoint(XElement node, XNamespace gpxNamespace)
+    public GpxWaypoint(XElement node, string gpxNamespace)
     {
         _gpxElement = node;
         _gpxNamespace = gpxNamespace;
