@@ -15,21 +15,36 @@ public class GpxData
     private XmlNamespaceManager _gpxNamespaceManager;
     private XNamespace _gpxNamespace;
 
-    public IEnumerable<GpxWaypoint>? Waypoints
+    private const string NamespacePrefix = "gpx";
+
+    public IList<GpxWaypoint>? Waypoints
     {
         get
         {
-            var nodes = _gpxData.XPathSelectElements("//gpx:trkpt", _gpxNamespaceManager);
-
-            if (nodes is null) return null;
-
-            var waypoints = new List<GpxWaypoint>();
-            foreach(var node in nodes)
-            {
-                waypoints.Add(new GpxWaypoint(node, _gpxNamespace));
-            }
-            return waypoints;
+            return GetGpxElements<GpxWaypoint>("trkpt");
         }
+    }
+    public IList<GpxTrack>? Tracks
+    {
+        get
+        {
+            return GetGpxElements<GpxTrack>("trk");
+        }
+    }
+
+    private IList<T>? GetGpxElements<T>(string path)
+    {
+        var nodes = _gpxData.XPathSelectElements($"//{NamespacePrefix}:{path}", _gpxNamespaceManager);
+
+        if (nodes is null) return null;
+
+        var elements = new List<T>();
+        foreach (var node in nodes)
+        {
+            var element = (T) Activator.CreateInstance(typeof(T), new object[] { node, _gpxNamespace })!;
+            elements.Add(element);
+        }
+        return elements;
     }
 
     public async Task Load(Stream input)
@@ -40,7 +55,7 @@ public class GpxData
         _gpxData = XDocument.Load(input);
 
         _gpxNamespaceManager = new XmlNamespaceManager(new NameTable());
-        _gpxNamespaceManager.AddNamespace("gpx", gpxNamespace);
+        _gpxNamespaceManager.AddNamespace(NamespacePrefix, gpxNamespace);
     }
 
     public static async Task<bool> CanRead(Stream input)

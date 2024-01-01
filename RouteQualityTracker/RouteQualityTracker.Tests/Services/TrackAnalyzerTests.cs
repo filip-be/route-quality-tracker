@@ -160,9 +160,9 @@ public class TrackAnalyzerTests
 
         var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
 
-        result.Tracks[0].Color.Should().Be(TrackColor.Bad);
-        result.Tracks[1].Color.Should().Be(TrackColor.Standard);
-        result.Tracks[2].Color.Should().Be(TrackColor.Good);
+        result.Tracks[0]!.Color.Should().Be(TrackColor.Bad);
+        result.Tracks[1]!.Color.Should().Be(TrackColor.Standard);
+        result.Tracks[2]!.Color.Should().Be(TrackColor.Good);
     }
 
     // Split track into multiple tracks based on route quality records
