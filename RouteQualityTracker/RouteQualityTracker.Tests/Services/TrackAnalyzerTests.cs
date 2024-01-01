@@ -122,7 +122,7 @@ public class TrackAnalyzerTests
             {
                 Date = new DateTime(2023, 12, 16, 09, 11, 0),
                 RouteQuality = RouteQualityEnum.Bad
-            },
+            }
         };
 
         var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
@@ -130,6 +130,7 @@ public class TrackAnalyzerTests
         result.Tracks.Count().Should().Be(2);
     }
 
+    // See https://osmand.net/docs/technical/osmand-file-formats/osmand-gpx#track-appearance
     [Test]
     public async Task MarkupTrack_AddsColorToTrack()
     {
@@ -155,23 +156,92 @@ public class TrackAnalyzerTests
             {
                 Date = new DateTime(2023, 12, 16, 09, 12, 0),
                 RouteQuality = RouteQualityEnum.Good
-            },
+            }
         };
 
         var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
 
-        result.Tracks[0]!.Color.Should().Be(TrackColor.Bad);
-        result.Tracks[1]!.Color.Should().Be(TrackColor.Standard);
-        result.Tracks[2]!.Color.Should().Be(TrackColor.Good);
+        result.Tracks[0].Color.Should().Be(TrackColor.Bad);
+        result.Tracks[1].Color.Should().Be(TrackColor.Standard);
+        result.Tracks[2].Color.Should().Be(TrackColor.Good);
     }
 
-    // Split track into multiple tracks based on route quality records
-    // add color for each track - see https://osmand.net/docs/technical/osmand-file-formats/osmand-gpx#track-appearance
-    // /trk/extensions/color
+    [Test]
+    public async Task MarkupTrack_IgnoresQuickRouteQualitySwitch()
+    {
+        using var inputStream = PrepareGpxXml(
+            new DateTime(2023, 12, 16, 09, 10, 0),
+            new DateTime(2023, 12, 16, 09, 11, 0),
+            new DateTime(2023, 12, 16, 09, 12, 0));
 
-    // Ignore quick route quality switches (few seconds)
+        var qualityPoints = new List<RouteQualityRecord>
+        {
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 10, 0),
+                RouteQuality = RouteQualityEnum.Bad
+            },
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 11, 0),
+                RouteQuality = RouteQualityEnum.Good
+            },
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 11, 05),
+                RouteQuality = RouteQualityEnum.Standard
+            }
+        };
 
-    // Match records to points (before/after, etc.)
+        var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
+
+        result.Tracks.Count().Should().Be(2, "because 5-seconds long record should be ignored");
+        result.Tracks[0].Color.Should().Be(TrackColor.Bad, "because initial quality record was bad");
+        result.Tracks[0].Color.Should().Be(TrackColor.Standard, "because last quality record was standard");
+    }
+
+    // Match records to points (before/after, etc.)[Test]
+    public async Task MarkupTrack_MatchesRecordsToTrackPoints()
+    {
+        var firstTrackStart = new DateTime(2023, 12, 16, 09, 10, 0);
+        var secondTrackStart = new DateTime(2023, 12, 16, 09, 11, 0);
+        var thirdTrackStart = new DateTime(2023, 12, 16, 09, 12, 0);
+
+        using var inputStream = PrepareGpxXml(
+            firstTrackStart,
+            secondTrackStart,
+            thirdTrackStart,
+            new DateTime(2023, 12, 16, 09, 13, 0));
+
+        var qualityPoints = new List<RouteQualityRecord>
+        {
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 10, 0),
+                RouteQuality = RouteQualityEnum.Bad
+            },
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 10, 50),
+                RouteQuality = RouteQualityEnum.Standard
+            },
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 12, 10),
+                RouteQuality = RouteQualityEnum.Good
+            }
+        };
+
+        var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
+
+        result.Tracks.Count().Should().Be(3);
+        result.Tracks[0].Color.Should().Be(TrackColor.Bad);
+        result.Tracks[0].StartTime.Should().Be(firstTrackStart);
+        result.Tracks[1].Color.Should().Be(TrackColor.Standard);
+        result.Tracks[1].StartTime.Should().Be(secondTrackStart);
+        result.Tracks[2].Color.Should().Be(TrackColor.Standard);
+        result.Tracks[2].StartTime.Should().Be(thirdTrackStart);
+    }
 
     private MemoryStream PrepareGpxXml(params DateTimeOffset[] trackPoints)
     {
