@@ -60,6 +60,7 @@
 
 	<ItemGroup>
 	  <None Remove="resources\icons\compass.svg" />
+	  <None Remove="Resources\Images\file_export.svg" />
 	</ItemGroup>
 
 	<ItemGroup>

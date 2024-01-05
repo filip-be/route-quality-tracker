@@ -45,7 +45,10 @@ public class TrackAnalyzer : ITrackAnalyzer
         records = records.OrderBy(r => r.Date).ToList();
         records = FlattenRouteQualityRecords(records);
 
-        var tracks = SplitTracks(gpxData.Tracks[0], waypoints, records);
+        var task = new Task<List<GpxTrack>>(() => SplitTracks(gpxData.Tracks[0], waypoints, records));
+        task.Start();
+        
+        var tracks = await task.WaitAsync(new CancellationToken());
         gpxData.Tracks = tracks;
 
         return gpxData;
@@ -68,8 +71,6 @@ public class TrackAnalyzer : ITrackAnalyzer
 
             if (lastRecord.RouteQuality == record.RouteQuality) continue;
             
-
-
             if (recordsTimeDifference.CompareTo(MinimumQualityRecordTimeDifference) > 0)
             {
                 updatedRecords.Add(record);
@@ -83,7 +84,7 @@ public class TrackAnalyzer : ITrackAnalyzer
         return updatedRecords;
     }
 
-    private static List<GpxTrack> SplitTracks(GpxTrack originalTrack, ICollection<GpxWaypoint> wayPoints, ICollection<RouteQualityRecord> records)
+    private static List<GpxTrack> SplitTracks(GpxTrack originalTrack, List<GpxWaypoint> wayPoints, ICollection<RouteQualityRecord> records)
     {
         records.Add(new RouteQualityRecord
         {
@@ -110,11 +111,14 @@ public class TrackAnalyzer : ITrackAnalyzer
         return newTracks;
     }
 
-    private static GpxTrack? GetTrackWithPointsBefore(DateTimeOffset lookupDate, ICollection<GpxWaypoint> wayPoints, GpxTrack originalTrack)
+    private static GpxTrack? GetTrackWithPointsBefore(DateTimeOffset lookupDate, List<GpxWaypoint> wayPoints, GpxTrack originalTrack)
     {
-        var trackWayPoints = wayPoints
-            .Where(w => lookupDate.CompareTo(w.TimeUtc!.Value) > 0)
-            .ToList();
+        var firstNotMatchingPoint = wayPoints.Find(w => lookupDate.CompareTo(w.TimeUtc!.Value) <= 0);
+        var firstNotMatchingPointIndex = firstNotMatchingPoint is not null
+            ? wayPoints.IndexOf(firstNotMatchingPoint)
+            : wayPoints.Count - 1;
+        
+        var trackWayPoints = wayPoints[..firstNotMatchingPointIndex];
 
         if (trackWayPoints.Count == 0) return null;
 

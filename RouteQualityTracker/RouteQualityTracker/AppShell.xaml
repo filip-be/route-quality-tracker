@@ -17,4 +17,10 @@
         ContentTemplate="{DataTemplate pages:SettingsPage}"
         Route="Settings"
         Icon="gear_solid.svg"/>
+
+    <ShellContent
+        Title="Track operations"
+        ContentTemplate="{DataTemplate pages:TrackOperationsPage}"
+        Route="TrackOperations"
+        Icon="file_export.svg"/>
 </Shell>

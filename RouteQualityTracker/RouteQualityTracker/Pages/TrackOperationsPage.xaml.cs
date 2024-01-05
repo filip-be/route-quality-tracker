@@ -2,10 +2,10 @@ using System.IO;
 using System.Text.Json;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;
-using Microsoft.Maui.Storage;
 using RouteQualityTracker.Core.Gpx;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
+using RouteQualityTracker.Core.Services;
 
 namespace RouteQualityTracker.Pages;
 
@@ -17,10 +17,10 @@ public partial class TrackOperationsPage : ContentPage
     private FileResult? _gpxFile;
     private GpxData? _gpxData;
 
-    public TrackOperationsPage(ITrackAnalyzer trackAnalyzer)
+    public TrackOperationsPage()
     {
-        _trackAnalyzer = trackAnalyzer;
         InitializeComponent();
+        _trackAnalyzer = ServiceHelper.GetService<ITrackAnalyzer>();
     }
 
     private async void OnLoadRouteQuality(object sender, EventArgs e)
@@ -30,11 +30,11 @@ public partial class TrackOperationsPage : ContentPage
             var fileTypes = new FilePickerFileType(
                 new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
-                    { DevicePlatform.iOS, new[] { ".json" } },
-                    { DevicePlatform.Android, new[] { ".json" } },
-                    { DevicePlatform.WinUI, new[] { ".json" } },
-                    { DevicePlatform.Tizen, new[] { ".json" } },
-                    { DevicePlatform.macOS, new[] { ".json" } }
+                    { DevicePlatform.iOS, new[] { "*/*" } },
+                    { DevicePlatform.Android, new[] { "*/*" } },
+                    { DevicePlatform.WinUI, new[] { "*/*" } },
+                    { DevicePlatform.Tizen, new[] { "*/*" } },
+                    { DevicePlatform.macOS, new[] { "*/*" } }
                 });
 
             var options = new PickOptions
@@ -69,11 +69,11 @@ public partial class TrackOperationsPage : ContentPage
             var fileTypes = new FilePickerFileType(
                 new Dictionary<DevicePlatform, IEnumerable<string>>
                 {
-                    { DevicePlatform.iOS, new[] { ".gpx" } },
-                    { DevicePlatform.Android, new[] { ".gpx" } },
-                    { DevicePlatform.WinUI, new[] { ".gpx" } },
-                    { DevicePlatform.Tizen, new[] { ".gpx" } },
-                    { DevicePlatform.macOS, new[] { ".gpx" } }
+                    { DevicePlatform.iOS, new[] { "*.*" } },
+                    { DevicePlatform.Android, new[] { "*/*" } },
+                    { DevicePlatform.WinUI, new[] { "*.*" } },
+                    { DevicePlatform.Tizen, new[] { "*.*" } },
+                    { DevicePlatform.macOS, new[] { "*.*" } }
                 });
 
             var options = new PickOptions
@@ -110,17 +110,25 @@ public partial class TrackOperationsPage : ContentPage
         try
         {
             await using var fileStream = await _gpxFile!.OpenReadAsync();
-            
+
+            logEditor.Text += $"{Environment.NewLine}Processing track data, it may take a while";
+            saveTrackBtn.IsEnabled = false;
+            resetBtn.IsEnabled = false;
+
             _gpxData = await _trackAnalyzer.MarkupTrack(fileStream, _routeQualityRecords!);
             logEditor.Text += $"{Environment.NewLine}Processed files. Found {_gpxData.Tracks.Count} track segments";
 
             saveTrackBtn.IsEnabled = true;
             processFilesBtn.IsEnabled = false;
+            resetBtn.IsEnabled = true;
         }
         catch (Exception ex)
         {
             await Toast.Make($"Error processing track: {ex.Message}").Show();
             logEditor.Text += $"{Environment.NewLine}Error: {ex}";
+
+            saveTrackBtn.IsEnabled = true;
+            resetBtn.IsEnabled = true;
         }
     }
 

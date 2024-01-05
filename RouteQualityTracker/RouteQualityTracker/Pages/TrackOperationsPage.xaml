@@ -5,7 +5,8 @@
              Title="TrackOperationsPage">
     <ScrollView>
         <VerticalStackLayout Padding="30" Spacing="10">
-            <Button Text="Reset"
+            <Button x:Name="resetBtn"
+                    Text="Reset"
                     BackgroundColor="{StaticResource PrimaryDark}"
                     TextColor="Black"
                     Clicked="OnReset" />
