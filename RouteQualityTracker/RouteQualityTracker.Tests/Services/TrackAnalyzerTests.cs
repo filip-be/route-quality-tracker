@@ -126,7 +126,7 @@ public class TrackAnalyzerTests
 
         var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
 
-        result.Tracks.Count().Should().Be(2);
+        result.Tracks.Count.Should().Be(2);
     }
 
     // See https://osmand.net/docs/technical/osmand-file-formats/osmand-gpx#track-appearance
@@ -160,7 +160,7 @@ public class TrackAnalyzerTests
 
         var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
 
-        result.Tracks.Count().Should().Be(3);
+        result.Tracks.Count.Should().Be(3);
         result.Tracks[0].Color.Should().Be(TrackColor.Bad);
         result.Tracks[1].Color.Should().Be(TrackColor.Standard);
         result.Tracks[2].Color.Should().Be(TrackColor.Good);
@@ -171,7 +171,9 @@ public class TrackAnalyzerTests
     {
         using var inputStream = PrepareGpxXml(
             new DateTime(2023, 12, 16, 09, 10, 0),
+            new DateTime(2023, 12, 16, 09, 10, 1),
             new DateTime(2023, 12, 16, 09, 11, 0),
+            new DateTime(2023, 12, 16, 09, 11, 1),
             new DateTime(2023, 12, 16, 09, 12, 0));
 
         var qualityPoints = new List<RouteQualityRecord>
@@ -195,9 +197,41 @@ public class TrackAnalyzerTests
 
         var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
 
-        result.Tracks.Count().Should().Be(2, "because 5-seconds long record should be ignored");
-        result.Tracks[0].Color.Should().Be(TrackColor.Bad, "because initial quality record was bad");
-        result.Tracks[0].Color.Should().Be(TrackColor.Standard, "because last quality record was standard");
+        result.Tracks.Count.Should().Be(2, "because 5-seconds long record should be ignored");
+    }
+
+    [Test]
+    public async Task MarkupTrack_MergesQualityRecordsWithSameQuality()
+    {
+        using var inputStream = PrepareGpxXml(
+            new DateTime(2023, 12, 16, 09, 10, 0),
+            new DateTime(2023, 12, 16, 09, 10, 1),
+            new DateTime(2023, 12, 16, 09, 11, 0),
+            new DateTime(2023, 12, 16, 09, 11, 1),
+            new DateTime(2023, 12, 16, 09, 12, 0));
+
+        var qualityPoints = new List<RouteQualityRecord>
+        {
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 10, 0),
+                RouteQuality = RouteQualityEnum.Bad
+            },
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 11, 0),
+                RouteQuality = RouteQualityEnum.Good
+            },
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 11, 30),
+                RouteQuality = RouteQualityEnum.Good
+            }
+        };
+
+        var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
+
+        result.Tracks.Count.Should().Be(2, "because last quality records is the same as previous");
     }
 
     // Match records to points (before/after, etc.)[Test]
@@ -235,7 +269,7 @@ public class TrackAnalyzerTests
 
         var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
 
-        result.Tracks.Count().Should().Be(3);
+        result.Tracks.Count.Should().Be(3);
         result.Tracks[0].Color.Should().Be(TrackColor.Bad);
         result.Tracks[0].StartTime.Should().Be(firstTrackStart);
         result.Tracks[1].Color.Should().Be(TrackColor.Standard);

@@ -2,7 +2,7 @@
 
 namespace RouteQualityTracker.Core.Gpx;
 
-public class GpxWaypoint
+public class GpxWaypoint : IGpxObject
 {
     private readonly XElement _gpxElement;
     private readonly string _gpxNamespace;
@@ -25,5 +25,15 @@ public class GpxWaypoint
     {
         _gpxElement = node;
         _gpxNamespace = gpxNamespace;
+    }
+
+    public void RemoveFromParent()
+    {
+        _gpxElement.Remove();
+    }
+
+    public XElement ToXElement()
+    {
+        return _gpxElement;
     }
 }

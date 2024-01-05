@@ -6,6 +6,8 @@ namespace RouteQualityTracker.Core.Services;
 
 public class TrackAnalyzer : ITrackAnalyzer
 {
+    public TimeSpan MinimumQualityRecordTimeDifference { get; set; } = TimeSpan.FromSeconds(10);
+
     public async Task<GpxData> MarkupTrack(Stream input, IList<RouteQualityRecord> records)
     {
         if (!await GpxData.CanRead(input))
@@ -16,42 +18,94 @@ public class TrackAnalyzer : ITrackAnalyzer
         var gpxData = new GpxData();
         await gpxData.Load(input);
 
-        var waypoints = gpxData.Waypoints
-            ?.Where(w => w.TimeUtc is not null)
+        var waypoints = gpxData.Tracks
+            .SelectMany(t => t.WayPoints)
+            .Where(w => w.TimeUtc is not null)
             .OrderBy(s => s.TimeUtc)
             .ToList();
 
-        if (waypoints?.Any() != true)
+        if (!waypoints.Any())
         {
-            throw new InvalidDataException("track has no waypoints");
+            throw new InvalidDataException("track has no wayPoints");
         }
 
-        if (records?.Any() != true)
+        if (!records.Any())
         {
             throw new InvalidDataException("there is no route quality records");
         }
 
-        var qualityTrackingStart = records.First().Date;
+        var qualityTrackingStart = records[0].Date;
 
-        if (qualityTrackingStart.Date < waypoints.First().TimeUtc!.Value.Date
-            || qualityTrackingStart.Date > waypoints.Last().TimeUtc!.Value.Date)
+        if (qualityTrackingStart.Date < waypoints[0].TimeUtc!.Value.Date
+            || qualityTrackingStart.Date > waypoints[^1].TimeUtc!.Value.Date)
         {
             throw new InvalidDataException("quality tracking data doesn't match GPX data");
         }
 
-        var tracks = SplitTracks(gpxData.Tracks, waypoints, records);
+        records = records.OrderBy(r => r.Date).ToList();
+        records = FlattenRouteQualityRecords(records);
+
+        var tracks = SplitTracks(gpxData.Tracks[0], waypoints, records);
         gpxData.Tracks = tracks;
 
         return gpxData;
     }
 
-    private IList<GpxTrack> SplitTracks(IList<GpxTrack> tracks, IList<GpxWaypoint> waypoints, IList<RouteQualityRecord> records)
+    private IList<RouteQualityRecord> FlattenRouteQualityRecords(IList<RouteQualityRecord> records)
     {
+        var updatedRecords = new List<RouteQualityRecord>();
 
+        foreach (var record in records)
+        {
+            if (updatedRecords.Count == 0)
+            {
+                updatedRecords.Add(record);
+                continue;
+            }
 
-        var originalTrack = tracks.First();
+            var lastRecord = updatedRecords[^1];
+            var recordsTimeDifference = record.Date.Subtract(lastRecord.Date);
+            if (recordsTimeDifference.CompareTo(MinimumQualityRecordTimeDifference) > 0
+                && lastRecord.RouteQuality != record.RouteQuality)
+            {
+                updatedRecords.Add(record);
+            }
+        }
 
+        return updatedRecords;
+    }
 
-        return null;
+    private static List<GpxTrack> SplitTracks(GpxTrack originalTrack, List<GpxWaypoint> wayPoints, ICollection<RouteQualityRecord> records)
+    {
+        records.Add(new RouteQualityRecord
+        {
+            Date = DateTimeOffset.MaxValue,
+            RouteQuality = RouteQualityEnum.Unknown
+        });
+
+        List<GpxTrack> newTracks = records
+            .Select(qualityRecord => GetTrackWithPointsBefore(qualityRecord.Date, wayPoints, originalTrack))
+            .Where(track => track is not null)
+            .ToList()!;
+
+        return newTracks;
+    }
+
+    private static GpxTrack? GetTrackWithPointsBefore(DateTimeOffset lookupDate, ICollection<GpxWaypoint> wayPoints, GpxTrack originalTrack)
+    {
+        var trackWayPoints = wayPoints
+            .Where(w => lookupDate.CompareTo(w.TimeUtc!.Value) > 0)
+            .ToList();
+
+        if (trackWayPoints.Count == 0) return null;
+        
+        var track = originalTrack.CloneEmptyTrack();
+        foreach (var wayPoint in trackWayPoints)
+        {
+            wayPoints.Remove(wayPoint);
+        }
+        track.WayPoints = trackWayPoints;
+
+        return track;
     }
 }

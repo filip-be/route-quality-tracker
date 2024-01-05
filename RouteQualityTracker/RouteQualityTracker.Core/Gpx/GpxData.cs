@@ -8,17 +8,15 @@ public class GpxData
     private XDocument _gpxData;
     private string _gpxNamespace;
 
-    public IList<GpxWaypoint>? Waypoints => _gpxData.Root?.XPathSelectElements<GpxWaypoint>("//trkpt", _gpxNamespace);
-
-    public IList<GpxTrack>? Tracks
+    public IList<GpxTrack> Tracks
     {
-        get => _gpxData.Root?.XPathSelectElements<GpxTrack>("//trk", _gpxNamespace);
+        get => _gpxData.Root?.XPathSelectElements<GpxTrack>("//trk", _gpxNamespace) ?? new List<GpxTrack>();
         set
         {
             var oldTracks = _gpxData.Root?.XPathSelectElements<GpxTrack>("//trk", _gpxNamespace);
             oldTracks?.ForEach(t => t.RemoveFromParent());
 
-            value?.ToList().ForEach(t => _gpxData.Add(t.ToXElement()));
+            value.ToList().ForEach(t => _gpxData.Root!.Add(t.ToXElement()));
         }
     }
 
@@ -32,7 +30,7 @@ public class GpxData
 
     public static async Task<bool> CanRead(Stream input)
     {
-        var contentNamespace = await GetXmlNamespace(input);  
+        var contentNamespace = await GetXmlNamespace(input);
         return contentNamespace is "http://www.topografix.com/GPX/1/0" or "http://www.topografix.com/GPX/1/1";
     }
 

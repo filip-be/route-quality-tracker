@@ -3,10 +3,23 @@ using System.Xml.Linq;
 
 namespace RouteQualityTracker.Core.Gpx;
 
-public class GpxTrack
+public class GpxTrack : IGpxObject
 {
     private readonly XElement _gpxElement;
     private readonly string _gpxNamespace;
+
+    public IList<GpxWaypoint> WayPoints
+    {
+        get => _gpxElement.XPathSelectElements<GpxWaypoint>("//trkpt", _gpxNamespace) ??
+               new List<GpxWaypoint>();
+        set
+        {
+            var oldWayPoints = _gpxElement.XPathSelectElements<GpxWaypoint>("//trkpt", _gpxNamespace);
+            oldWayPoints?.ForEach(w => w.RemoveFromParent());
+
+            value.ToList().ForEach(t => _gpxElement.Add(t.ToXElement()));
+        }
+    } 
 
     public TrackColor? Color
     {
@@ -44,5 +57,15 @@ public class GpxTrack
     public XElement ToXElement()
     {
         return _gpxElement;
+    }
+
+    public GpxTrack CloneEmptyTrack()
+    {
+        var gpxClone = XElement.Parse(_gpxElement.ToString());
+        
+        return new GpxTrack(gpxClone, _gpxNamespace)
+        {
+            WayPoints = new List<GpxWaypoint>()
+        };
     }
 }
