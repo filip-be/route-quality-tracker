@@ -10,8 +10,7 @@ public class GpxTrack : IGpxObject
 
     public IList<GpxWaypoint> WayPoints
     {
-        get => _gpxElement.XPathSelectElements<GpxWaypoint>("//trkpt", _gpxNamespace) ??
-               new List<GpxWaypoint>();
+        get => _gpxElement.XPathSelectElements<GpxWaypoint>("//trkpt", _gpxNamespace);
         set
         {
             var oldWayPoints = _gpxElement.XPathSelectElements<GpxWaypoint>("//trkpt", _gpxNamespace);
@@ -71,13 +70,6 @@ public class GpxTrack : IGpxObject
                 RouteQualityEnum.Good => TrackColor.Good,
                 _ => throw new ArgumentOutOfRangeException(nameof(value), value, null)
             };
-        }
-    }
-
-    public DateTimeOffset? StartTime 
-    {   get
-        {
-            return null;
         }
     }
 

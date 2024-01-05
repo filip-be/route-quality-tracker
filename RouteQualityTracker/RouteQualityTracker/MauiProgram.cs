@@ -31,6 +31,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IQualityTrackingService, QualityTrackingService>();
 
         builder.Services.AddScoped<INotificationService, NotificationService>();
+        builder.Services.AddScoped<ITrackAnalyzer, TrackAnalyzer>();
 
 #if ANDROID
         builder.Services.AddSingleton<MainActivity>();

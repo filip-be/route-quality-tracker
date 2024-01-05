@@ -28,6 +28,11 @@ public class GpxData
         _gpxData = XDocument.Load(input);
     }
 
+    public async Task Save(Stream stream, CancellationToken cancellationToken = default)
+    {
+        await _gpxData.SaveAsync(stream, SaveOptions.OmitDuplicateNamespaces, cancellationToken);
+    }
+
     public static async Task<bool> CanRead(Stream input)
     {
         var contentNamespace = await GetXmlNamespace(input);

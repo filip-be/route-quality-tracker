@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RouteQualityTracker.Pages.TrackOperationsPage"
+             Title="TrackOperationsPage">
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="10">
+            <Button Text="Reset"
+                    BackgroundColor="{StaticResource PrimaryDark}"
+                    TextColor="Black"
+                    Clicked="OnReset" />
+
+            <BoxView HeightRequest="1" Color="LightGray" />
+
+            <Button x:Name="loadRouteQualityBtn"
+                    Text="Load route quality data"
+                    Clicked="OnLoadRouteQuality" />
+
+            <Button x:Name="loadGpxBtn"
+                    Text="Load GPX track"
+                    IsEnabled="False"
+                    Clicked="OnLoadGpx" />
+
+            <Button x:Name="processFilesBtn"
+                    Text="Generate track with route quality"
+                    IsEnabled="False"
+                    Clicked="OnProcessFiles" />
+
+            <Button x:Name="saveTrackBtn"
+                    Text="Save track with route quality"
+                    IsEnabled="False"
+                    Clicked="OnSaveTrack" />
+
+            <Editor x:Name="logEditor"
+                    Placeholder="Load route quality data"
+                    HeightRequest="250"
+                    AutoSize="TextChanges"
+                    IsReadOnly="True" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
