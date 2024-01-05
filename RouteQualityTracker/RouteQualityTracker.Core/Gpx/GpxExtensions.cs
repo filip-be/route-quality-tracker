@@ -47,7 +47,6 @@ public static class GpxExtensions
         var xPath = new StringBuilder();
         path.Split('/').ToList().ForEach(p =>
         {
-            Console.WriteLine(p);
             if (!string.IsNullOrEmpty(p))
             {
                 xPath.Append($"{NamespacePrefix}:{p}");

@@ -65,10 +65,18 @@ public class TrackAnalyzer : ITrackAnalyzer
 
             var lastRecord = updatedRecords[^1];
             var recordsTimeDifference = record.Date.Subtract(lastRecord.Date);
-            if (recordsTimeDifference.CompareTo(MinimumQualityRecordTimeDifference) > 0
-                && lastRecord.RouteQuality != record.RouteQuality)
+
+            if (lastRecord.RouteQuality == record.RouteQuality) continue;
+            
+
+
+            if (recordsTimeDifference.CompareTo(MinimumQualityRecordTimeDifference) > 0)
             {
                 updatedRecords.Add(record);
+            }
+            else
+            {
+                lastRecord.RouteQuality = record.RouteQuality;
             }
         }
 

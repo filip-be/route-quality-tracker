@@ -65,13 +65,13 @@ public class TrackAnalyzerTests
     [Test]
     public async Task MarkupTrack_Throws_WhenQualityData_IsFromAnotherDay()
     {
-        using var inputStream = PrepareGpxXml(new DateTime(2023, 12, 12));
+        using var inputStream = PrepareGpxXml(new DateTime(2023, 12, 12, 0, 0, 0, DateTimeKind.Utc));
 
         var qualityPoints = new List<RouteQualityRecord>
         {
             new()
             {
-                Date = new DateTime(2023, 12, 01),
+                Date = new DateTime(2023, 12, 01, 0, 0, 0, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Standard
             }
         };
@@ -85,14 +85,14 @@ public class TrackAnalyzerTests
     public async Task MarkupTrack_Returns_GpxData()
     {
         using var inputStream = PrepareGpxXml(
-            new DateTime(2023, 12, 16, 09, 10, 0),
-            new DateTime(2023, 12, 16, 09, 11, 0));
+            new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc));
 
         var qualityPoints = new List<RouteQualityRecord>
         {
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 10, 0),
+                Date = new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Standard
             }
         };
@@ -106,20 +106,20 @@ public class TrackAnalyzerTests
     public async Task MarkupTrack_SplitsGpxIntoMultipleTracks()
     {
         using var inputStream = PrepareGpxXml(
-            new DateTime(2023, 12, 16, 09, 10, 0),
-            new DateTime(2023, 12, 16, 09, 11, 0),
-            new DateTime(2023, 12, 16, 09, 12, 0));
+            new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 12, 0, DateTimeKind.Utc));
 
         var qualityPoints = new List<RouteQualityRecord>
         {
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 10, 0),
+                Date = new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Standard
             },
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 11, 0),
+                Date = new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Bad
             }
         };
@@ -134,26 +134,26 @@ public class TrackAnalyzerTests
     public async Task MarkupTrack_AddsColorToTrack()
     {
         using var inputStream = PrepareGpxXml(
-            new DateTime(2023, 12, 16, 09, 10, 0),
-            new DateTime(2023, 12, 16, 09, 11, 0),
-            new DateTime(2023, 12, 16, 09, 12, 0),
-            new DateTime(2023, 12, 16, 09, 13, 0));
+            new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 12, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 13, 0, DateTimeKind.Utc));
 
         var qualityPoints = new List<RouteQualityRecord>
         {
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 10, 0),
+                Date = new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Bad
             },
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 11, 0),
+                Date = new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Standard
             },
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 12, 0),
+                Date = new DateTime(2023, 12, 16, 09, 12, 0, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Good
             }
         };
@@ -167,30 +167,80 @@ public class TrackAnalyzerTests
     }
 
     [Test]
-    public async Task MarkupTrack_IgnoresQuickRouteQualitySwitch()
+    public async Task MarkupTrack_AddsColorToTrack_WithQuickRouteQualitySwitch()
     {
         using var inputStream = PrepareGpxXml(
-            new DateTime(2023, 12, 16, 09, 10, 0),
-            new DateTime(2023, 12, 16, 09, 10, 1),
-            new DateTime(2023, 12, 16, 09, 11, 0),
-            new DateTime(2023, 12, 16, 09, 11, 1),
-            new DateTime(2023, 12, 16, 09, 12, 0));
+            new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 1, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 2, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 3, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 12, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 12, 1, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 12, 2, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 12, 3, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 13, 0, DateTimeKind.Utc));
 
         var qualityPoints = new List<RouteQualityRecord>
         {
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 10, 0),
+                Date = new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
+                RouteQuality = RouteQualityEnum.Bad
+            },
+            // This record route quality should be ignored as next record differs only in 5 secods
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
+                RouteQuality = RouteQualityEnum.Good
+            },
+            // This record route quality should be used instead
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 11, 5, DateTimeKind.Utc),
+                RouteQuality = RouteQualityEnum.Standard
+            },
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 12, 0, DateTimeKind.Utc),
+                RouteQuality = RouteQualityEnum.Bad
+            }
+        };
+
+        var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
+
+        result.Tracks.Count.Should().Be(3);
+        result.Tracks[0].TrackQuality.Should().Be(RouteQualityEnum.Bad);
+        result.Tracks[1].TrackQuality.Should().Be(RouteQualityEnum.Standard);
+        result.Tracks[2].TrackQuality.Should().Be(RouteQualityEnum.Bad);
+    }
+
+    [Test]
+    public async Task MarkupTrack_IgnoresQuickRouteQualitySwitch()
+    {
+        using var inputStream = PrepareGpxXml(
+            new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 10, 1, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 1, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 12, 0, DateTimeKind.Utc));
+
+        var qualityPoints = new List<RouteQualityRecord>
+        {
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Bad
             },
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 11, 0),
+                Date = new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Good
             },
+            // This record should be ignored as it differs only in 5 seconds from previous
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 11, 05),
+                Date = new DateTime(2023, 12, 16, 09, 11, 05, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Standard
             }
         };
@@ -204,27 +254,28 @@ public class TrackAnalyzerTests
     public async Task MarkupTrack_MergesQualityRecordsWithSameQuality()
     {
         using var inputStream = PrepareGpxXml(
-            new DateTime(2023, 12, 16, 09, 10, 0),
-            new DateTime(2023, 12, 16, 09, 10, 1),
-            new DateTime(2023, 12, 16, 09, 11, 0),
-            new DateTime(2023, 12, 16, 09, 11, 1),
-            new DateTime(2023, 12, 16, 09, 12, 0));
+            new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 10, 1, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 1, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 12, 0, DateTimeKind.Utc));
 
         var qualityPoints = new List<RouteQualityRecord>
         {
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 10, 0),
+                Date = new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Bad
             },
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 11, 0),
+                Date = new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Good
             },
+            // This record has the same quality as previous and should be ignored
             new()
             {
-                Date = new DateTime(2023, 12, 16, 09, 11, 30),
+                Date = new DateTime(2023, 12, 16, 09, 11, 30, DateTimeKind.Utc),
                 RouteQuality = RouteQualityEnum.Good
             }
         };
