@@ -14,27 +14,14 @@ public static class GpxExtensions
         return rootElement.Element(xNamespace + name);
     }
 
-    public static List<T>? XPathSelectElements<T>(this XElement rootElement, string path, XNamespace xNamespace)
+    public static List<T> XPathSelectElements<T>(this XElement rootElement, string path, XNamespace xNamespace)
     {
         var gpxNamespaceManager = new XmlNamespaceManager(new NameTable());
         gpxNamespaceManager.AddNamespace(NamespacePrefix, xNamespace.ToString());
 
-        Console.WriteLine(path);
-        var xPath = new StringBuilder();
-        path.Split('/').ToList().ForEach(p => 
-        {
-            Console.WriteLine(p);
-            if (!string.IsNullOrEmpty(p))
-            {
-                xPath.Append($"{NamespacePrefix}:{p}");
-            }
-            xPath.Append('/');
-        });
-        var constructedPath = xPath.ToString();
-        constructedPath = constructedPath.TrimEnd('/');
-
-        Console.WriteLine($"constructed path: {constructedPath}");
-        var nodes = rootElement.XPathSelectElements(constructedPath, gpxNamespaceManager);
+        var xPath = EnhancePathWithNamespace(path, xNamespace);
+        
+        var nodes = rootElement.XPathSelectElements(xPath, gpxNamespaceManager);
 
         var elements = new List<T>();
         foreach (var node in nodes)
@@ -50,6 +37,26 @@ public static class GpxExtensions
         var gpxNamespaceManager = new XmlNamespaceManager(new NameTable());
         gpxNamespaceManager.AddNamespace(NamespacePrefix, xNamespace.ToString());
 
-        return rootElement.XPathSelectElement($"/{NamespacePrefix}:{path}", gpxNamespaceManager);
+        var xPath = EnhancePathWithNamespace(path, xNamespace);
+
+        return rootElement.XPathSelectElement(xPath, gpxNamespaceManager);
+    }
+
+    public static string EnhancePathWithNamespace(string path, XNamespace xNamespace)
+    {
+        var xPath = new StringBuilder();
+        path.Split('/').ToList().ForEach(p =>
+        {
+            Console.WriteLine(p);
+            if (!string.IsNullOrEmpty(p))
+            {
+                xPath.Append($"{NamespacePrefix}:{p}");
+            }
+            xPath.Append('/');
+        });
+        var constructedPath = xPath.ToString();
+        constructedPath = constructedPath.TrimEnd('/');
+
+        return constructedPath;
     }
 }

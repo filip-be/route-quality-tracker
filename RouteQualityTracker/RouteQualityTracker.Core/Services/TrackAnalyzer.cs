@@ -51,7 +51,7 @@ public class TrackAnalyzer : ITrackAnalyzer
         return gpxData;
     }
 
-    private IList<RouteQualityRecord> FlattenRouteQualityRecords(IList<RouteQualityRecord> records)
+    private List<RouteQualityRecord> FlattenRouteQualityRecords(IEnumerable<RouteQualityRecord> records)
     {
         var updatedRecords = new List<RouteQualityRecord>();
 
@@ -75,7 +75,7 @@ public class TrackAnalyzer : ITrackAnalyzer
         return updatedRecords;
     }
 
-    private static List<GpxTrack> SplitTracks(GpxTrack originalTrack, List<GpxWaypoint> wayPoints, ICollection<RouteQualityRecord> records)
+    private static List<GpxTrack> SplitTracks(GpxTrack originalTrack, ICollection<GpxWaypoint> wayPoints, ICollection<RouteQualityRecord> records)
     {
         records.Add(new RouteQualityRecord
         {
@@ -83,10 +83,21 @@ public class TrackAnalyzer : ITrackAnalyzer
             RouteQuality = RouteQualityEnum.Unknown
         });
 
-        List<GpxTrack> newTracks = records
-            .Select(qualityRecord => GetTrackWithPointsBefore(qualityRecord.Date, wayPoints, originalTrack))
-            .Where(track => track is not null)
-            .ToList()!;
+        var newTracks = new List<GpxTrack>();
+
+        var previousRouteQuality = RouteQualityEnum.Unknown;
+        foreach (var qualityRecord in records)
+        {
+            var trackQuality = previousRouteQuality;
+            previousRouteQuality = qualityRecord.RouteQuality;
+
+            var newTrack = GetTrackWithPointsBefore(qualityRecord.Date, wayPoints, originalTrack);
+
+            if (newTrack is null) continue;
+
+            newTrack.TrackQuality = trackQuality;
+            newTracks.Add(newTrack);
+        }
 
         return newTracks;
     }
@@ -98,7 +109,7 @@ public class TrackAnalyzer : ITrackAnalyzer
             .ToList();
 
         if (trackWayPoints.Count == 0) return null;
-        
+
         var track = originalTrack.CloneEmptyTrack();
         foreach (var wayPoint in trackWayPoints)
         {

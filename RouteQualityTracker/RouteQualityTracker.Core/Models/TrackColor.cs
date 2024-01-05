@@ -1,8 +1,8 @@
 ﻿namespace RouteQualityTracker.Core.Models;
 
-public enum TrackColor
+public static class TrackColor
 {
-    Bad,
-    Standard,
-    Good
+    public const string Bad = "#000000";
+    public const string Standard = "#cccccc";
+    public const string Good = "#ffffff";
 }

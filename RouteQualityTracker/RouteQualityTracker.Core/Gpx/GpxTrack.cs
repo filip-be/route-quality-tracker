@@ -21,18 +21,56 @@ public class GpxTrack : IGpxObject
         }
     } 
 
-    public TrackColor? Color
+    public RouteQualityEnum? TrackQuality
     {
         get
         {
-            var colorElement = GpxExtensions.XPathSelectElement(_gpxElement, $"extensions/color", _gpxNamespace);
+            var colorElement = _gpxElement.XPathSelectElement("extensions/color", _gpxNamespace);
             var colorValue = colorElement?.Value;
-            
-            if (Enum.TryParse<TrackColor>(colorValue, true, out var color))
+
+            if (colorValue is null)
             {
-                return color;
+                return null;
             }
-            return null;
+
+            return colorValue switch
+            {
+                TrackColor.Bad => RouteQualityEnum.Bad,
+                TrackColor.Standard => RouteQualityEnum.Standard,
+                TrackColor.Good => RouteQualityEnum.Good,
+                _ => RouteQualityEnum.Unknown
+            };
+        }
+        set
+        {
+            var colorElement = _gpxElement.XPathSelectElement("extensions/color", _gpxNamespace);
+
+            if (value is null or RouteQualityEnum.Unknown)
+            {
+                colorElement?.Remove();
+            }
+
+            if (colorElement is null)
+            {
+                XNamespace xNamespace = _gpxNamespace;
+                var extensionsElement = _gpxElement.Element("extensions", _gpxNamespace);
+                if (extensionsElement is null)
+                {
+                    extensionsElement = new XElement(xNamespace + "extensions");
+                    _gpxElement.Add(extensionsElement);
+                }
+
+                colorElement = new XElement(xNamespace + "color");
+                extensionsElement.Add(colorElement);
+            }
+
+            colorElement.Value = value switch
+            {
+                RouteQualityEnum.Bad => TrackColor.Bad,
+                RouteQualityEnum.Standard => TrackColor.Standard,
+                RouteQualityEnum.Good => TrackColor.Good,
+                _ => throw new ArgumentOutOfRangeException(nameof(value), value, null)
+            };
         }
     }
 
