@@ -1,7 +1,5 @@
 ﻿using RouteQualityTracker.Core.Models;
-using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
 
 namespace RouteQualityTracker.Core.Gpx;
 
@@ -14,13 +12,13 @@ public class GpxTrack
     {
         get
         {
-            var colorElement = _gpxElement.SelectGpxElement($"extensions/color", _gpxNamespace);
+            var colorElement = GpxExtensions.XPathSelectElement(_gpxElement, $"extensions/color", _gpxNamespace);
             var colorValue = colorElement?.Value;
             
             if (Enum.TryParse<TrackColor>(colorValue, true, out var color))
             {
                 return color;
-            };
+            }
             return null;
         }
     }

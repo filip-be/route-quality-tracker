@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
+﻿using System.Xml;
 using System.Xml.Linq;
-using System.Xml.XPath;
 
 namespace RouteQualityTracker.Core.Gpx;
 
@@ -14,25 +8,15 @@ public class GpxData
     private XDocument _gpxData;
     private string _gpxNamespace;
 
-    private const string NamespacePrefix = "gpx";
+    public IList<GpxWaypoint>? Waypoints => _gpxData.Root?.XPathSelectElements<GpxWaypoint>("//trkpt", _gpxNamespace);
 
-    public IList<GpxWaypoint>? Waypoints
-    {
-        get
-        {
-            return _gpxData.Root.SelectGpxElements<GpxWaypoint>("//trkpt", _gpxNamespace);
-        }
-    }
     public IList<GpxTrack>? Tracks
     {
-        get
-        {
-            return _gpxData.Root.SelectGpxElements<GpxTrack>("//trk", _gpxNamespace);
-        }
+        get => _gpxData.Root?.XPathSelectElements<GpxTrack>("//trk", _gpxNamespace);
         set
         {
-            var oldTracks = _gpxData.Root.SelectGpxElements<GpxTrack>("//trk", _gpxNamespace);
-            oldTracks!.ForEach(t => t.RemoveFromParent());
+            var oldTracks = _gpxData.Root?.XPathSelectElements<GpxTrack>("//trk", _gpxNamespace);
+            oldTracks?.ForEach(t => t.RemoveFromParent());
 
             value?.ToList().ForEach(t => _gpxData.Add(t.ToXElement()));
         }

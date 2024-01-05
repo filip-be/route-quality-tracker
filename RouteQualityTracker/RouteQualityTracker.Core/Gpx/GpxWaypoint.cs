@@ -1,5 +1,4 @@
-﻿using System.Xml;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 namespace RouteQualityTracker.Core.Gpx;
 
@@ -12,7 +11,7 @@ public class GpxWaypoint
     {
         get
         {
-            var timeElement = _gpxElement.GpxElement("time", _gpxNamespace);
+            var timeElement = _gpxElement.Element("time", _gpxNamespace);
 
             if (DateTimeOffset.TryParse(timeElement?.Value ?? string.Empty, out var time))
             {
