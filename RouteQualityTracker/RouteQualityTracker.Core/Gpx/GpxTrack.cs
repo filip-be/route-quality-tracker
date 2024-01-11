@@ -92,7 +92,7 @@ public class GpxTrack : IGpxObject
 
     public GpxTrack CloneEmptyTrack()
     {
-        var gpxClone = XElement.Parse(_gpxElement.ToString());
+        var gpxClone = new XElement(_gpxElement);
         
         return new GpxTrack(gpxClone, _gpxNamespace)
         {
