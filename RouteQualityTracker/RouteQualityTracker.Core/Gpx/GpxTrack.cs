@@ -47,6 +47,7 @@ public class GpxTrack : IGpxObject
             if (value is null or RouteQualityEnum.Unknown)
             {
                 colorElement?.Remove();
+                return;
             }
 
             if (colorElement is null)

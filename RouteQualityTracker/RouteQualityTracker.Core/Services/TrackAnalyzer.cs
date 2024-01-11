@@ -47,7 +47,7 @@ public class TrackAnalyzer : ITrackAnalyzer
 
         var task = new Task<List<GpxTrack>>(() => SplitTracks(gpxData.Tracks[0], waypoints, records));
         task.Start();
-        
+
         var tracks = await task.WaitAsync(new CancellationToken());
         gpxData.Tracks = tracks;
 
@@ -70,7 +70,7 @@ public class TrackAnalyzer : ITrackAnalyzer
             var recordsTimeDifference = record.Date.Subtract(lastRecord.Date);
 
             if (lastRecord.RouteQuality == record.RouteQuality) continue;
-            
+
             if (recordsTimeDifference.CompareTo(MinimumQualityRecordTimeDifference) > 0)
             {
                 updatedRecords.Add(record);
@@ -117,8 +117,8 @@ public class TrackAnalyzer : ITrackAnalyzer
         var firstNotMatchingPointIndex = firstNotMatchingPoint is not null
             ? wayPoints.IndexOf(firstNotMatchingPoint)
             : wayPoints.Count - 1;
-        
-        var trackWayPoints = wayPoints[..firstNotMatchingPointIndex];
+
+        var trackWayPoints = wayPoints.Any() ? wayPoints[..firstNotMatchingPointIndex] : new List<GpxWaypoint>();
 
         if (trackWayPoints.Count == 0) return null;
 
