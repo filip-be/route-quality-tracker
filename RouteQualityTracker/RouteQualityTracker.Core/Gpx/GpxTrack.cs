@@ -16,12 +16,14 @@ public class GpxTrack : IGpxObject
             var oldWayPoints = _gpxElement.XPathSelectElements<GpxWaypoint>("//trkpt", _gpxNamespace);
             oldWayPoints?.ForEach(w => w.RemoveFromParent());
 
-            //var trackSegment = _gpxElement.XPathSelectElement("trkseg", _gpxNamespace);
-            //if (trackSegment is null)
-            //{
-            //}
+            var trackSegment = _gpxElement.XPathSelectElement("trkseg", _gpxNamespace);
+            if (trackSegment is null)
+            {
+                trackSegment = new XElement(_gpxNamespace + "trkseg");
+                _gpxElement.Add(trackSegment);
+            }
 
-            value.ToList().ForEach(t => _gpxElement.Add(t.ToXElement()));
+            value.ToList().ForEach(t => trackSegment.Add(t.ToXElement()));
         }
     } 
 
