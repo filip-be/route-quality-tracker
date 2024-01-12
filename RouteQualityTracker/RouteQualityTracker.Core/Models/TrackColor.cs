@@ -2,7 +2,12 @@
 
 public static class TrackColor
 {
-    public const string Bad = "#000000";
-    public const string Standard = "#cccccc";
-    public const string Good = "#ffffff";
+    // Unknown
+    public const string Unknown = "000000";
+    // Red
+    public const string Bad = "FF0000";
+    // Blue
+    public const string Standard = "0000FF";
+    // Green
+    public const string Good = "00FF00";
 }

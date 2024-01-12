@@ -105,6 +105,7 @@ public class TrackAnalyzer : ITrackAnalyzer
             if (newTrack is null) continue;
 
             newTrack.TrackQuality = trackQuality;
+            newTrack.Name = trackQuality.ToString();
             newTracks.Add(newTrack);
         }
 

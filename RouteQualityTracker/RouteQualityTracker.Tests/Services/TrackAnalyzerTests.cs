@@ -166,6 +166,44 @@ public class TrackAnalyzerTests
         result.Tracks[2].TrackQuality.Should().Be(RouteQualityEnum.Good);
     }
 
+
+    // See https://osmand.net/docs/technical/osmand-file-formats/osmand-gpx#track-appearance
+    [Test]
+    public async Task MarkupTrack_AddsNameToTrack()
+    {
+        using var inputStream = PrepareGpxXml(
+            new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 12, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 13, 0, DateTimeKind.Utc));
+
+        var qualityPoints = new List<RouteQualityRecord>
+        {
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
+                RouteQuality = RouteQualityEnum.Bad
+            },
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
+                RouteQuality = RouteQualityEnum.Standard
+            },
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 12, 0, DateTimeKind.Utc),
+                RouteQuality = RouteQualityEnum.Good
+            }
+        };
+
+        var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
+
+        result.Tracks.Count.Should().Be(3);
+        result.Tracks[0].Name.Should().Be(RouteQualityEnum.Bad.ToString());
+        result.Tracks[1].Name.Should().Be(RouteQualityEnum.Standard.ToString());
+        result.Tracks[2].Name.Should().Be(RouteQualityEnum.Good.ToString());
+    }
+
     [Test]
     public async Task MarkupTrack_AddsColorToTrack_WithQuickRouteQualitySwitch()
     {

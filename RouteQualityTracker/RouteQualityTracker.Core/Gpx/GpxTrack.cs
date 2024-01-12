@@ -7,6 +7,7 @@ public class GpxTrack : IGpxObject
 {
     private readonly XElement _gpxElement;
     private readonly XNamespace _gpxNamespace;
+    private readonly XNamespace _styleNamespace = "http://www.topografix.com/GPX/gpx_style/0/2";
 
     public IList<GpxWaypoint> WayPoints
     {
@@ -31,13 +32,8 @@ public class GpxTrack : IGpxObject
     {
         get
         {
-            var colorElement = _gpxElement.XPathSelectElement("extensions/color", _gpxNamespace);
-            var colorValue = colorElement?.Value;
-
-            if (colorValue is null)
-            {
-                return null;
-            }
+            var colorElement = GetColorElement();
+            var colorValue = colorElement.Value;
 
             return colorValue switch
             {
@@ -49,25 +45,12 @@ public class GpxTrack : IGpxObject
         }
         set
         {
-            var colorElement = _gpxElement.XPathSelectElement("extensions/color", _gpxNamespace);
+            var colorElement = GetColorElement();
 
-            if (value is null or RouteQualityEnum.Unknown)
+            if (value is null)
             {
-                colorElement?.Remove();
+                colorElement.Remove();
                 return;
-            }
-
-            if (colorElement is null)
-            {
-                var extensionsElement = _gpxElement.Element("extensions", _gpxNamespace);
-                if (extensionsElement is null)
-                {
-                    extensionsElement = new XElement(_gpxNamespace + "extensions");
-                    _gpxElement.Add(extensionsElement);
-                }
-
-                colorElement = new XElement(_gpxNamespace + "color");
-                extensionsElement.Add(colorElement);
             }
 
             colorElement.Value = value switch
@@ -75,9 +58,70 @@ public class GpxTrack : IGpxObject
                 RouteQualityEnum.Bad => TrackColor.Bad,
                 RouteQualityEnum.Standard => TrackColor.Standard,
                 RouteQualityEnum.Good => TrackColor.Good,
-                _ => throw new ArgumentOutOfRangeException(nameof(value), value, null)
+                RouteQualityEnum.Unknown => TrackColor.Unknown,
+                _ => throw new ArgumentOutOfRangeException(nameof(value), value, "Unsupported track quality")
             };
         }
+    }
+
+    public string? Name
+    {
+        get
+        {
+            var nameElement = _gpxElement.Element("name", _gpxNamespace);
+            return nameElement?.Value;
+        }
+        set
+        {
+            var nameElement = _gpxElement.Element("name", _gpxNamespace);
+
+            if (value is null)
+            {
+                nameElement?.Remove();
+                return;
+            }
+
+            if (nameElement is null)
+            {
+                nameElement = new XElement(_gpxNamespace + "name");
+                _gpxElement.Add(nameElement);
+            }
+
+            nameElement.Value = value;
+        }
+    }
+
+    private XElement GetExtensionsElement()
+    {
+        var extensionsElement = _gpxElement.Element("extensions", _gpxNamespace);
+        if (extensionsElement is null)
+        {
+            extensionsElement = new XElement(_gpxNamespace + "extensions");
+            _gpxElement.Add(extensionsElement);
+        }
+
+        return extensionsElement;
+    }
+
+    private XElement GetColorElement()
+    {
+        var extensionsElement = GetExtensionsElement();
+
+        var lineElement = extensionsElement.Element("line", _styleNamespace);
+        if (lineElement is null)
+        {
+            lineElement = new XElement(_styleNamespace + "line");
+            extensionsElement.Add(lineElement);
+        }
+
+        var colorElement = lineElement.Element("color", _styleNamespace);
+        if (colorElement is null)
+        {
+            colorElement = new XElement(_styleNamespace + "color");
+            lineElement.Add(colorElement);
+        }
+
+        return colorElement;
     }
 
     public GpxTrack(XElement node, XNamespace gpxNamespace)
