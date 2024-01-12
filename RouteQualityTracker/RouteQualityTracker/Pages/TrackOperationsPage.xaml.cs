@@ -16,6 +16,7 @@ public partial class TrackOperationsPage : ContentPage
     private IList<RouteQualityRecord>? _routeQualityRecords;
     private FileResult? _gpxFile;
     private GpxData? _gpxData;
+    private SemaphoreSlim _updateProgressBarSemaphore = new (1, 1);
 
     public TrackOperationsPage()
     {
@@ -111,24 +112,51 @@ public partial class TrackOperationsPage : ContentPage
         {
             await using var fileStream = await _gpxFile!.OpenReadAsync();
 
-            logEditor.Text += $"{Environment.NewLine}Processing track data, it may take a while";
+            logEditor.Text += $"{Environment.NewLine}Processing track data...";
             saveTrackBtn.IsEnabled = false;
             resetBtn.IsEnabled = false;
 
-            _gpxData = await _trackAnalyzer.MarkupTrack(fileStream, _routeQualityRecords!);
+            logEditor.IsVisible = false;
+            progressBar.Progress = 0;
+            progressBar.IsVisible = true;
+            processingLabel.IsVisible = true;
+            processFilesBtn.IsEnabled = false;
+
+            _gpxData = await _trackAnalyzer.MarkupTrack(fileStream, _routeQualityRecords!, UpdateProgressAction);
+
+            progressBar.IsVisible = false;
+            processingLabel.IsVisible = false;
+            logEditor.IsVisible = true;
             logEditor.Text += $"{Environment.NewLine}Processed files. Found {_gpxData.Tracks.Count} track segments";
 
             saveTrackBtn.IsEnabled = true;
-            processFilesBtn.IsEnabled = false;
             resetBtn.IsEnabled = true;
         }
         catch (Exception ex)
         {
             await Toast.Make($"Error processing track: {ex.Message}").Show();
+
+            progressBar.IsVisible = false;
+            processingLabel.IsVisible = false;
+            logEditor.IsVisible = true;
             logEditor.Text += $"{Environment.NewLine}Error: {ex}";
 
+            processFilesBtn.IsEnabled = true;
             saveTrackBtn.IsEnabled = true;
             resetBtn.IsEnabled = true;
+        }
+    }
+
+    private async Task UpdateProgressAction(double currentProgress)
+    {
+        try
+        {
+            await _updateProgressBarSemaphore.WaitAsync();
+            await progressBar.ProgressTo(currentProgress, 100, Easing.Linear);
+        }
+        finally
+        {
+            _updateProgressBarSemaphore.Release();
         }
     }
 

@@ -8,7 +8,7 @@ public class TrackAnalyzer : ITrackAnalyzer
 {
     public TimeSpan MinimumQualityRecordTimeDifference { get; set; } = TimeSpan.FromSeconds(10);
 
-    public async Task<GpxData> MarkupTrack(Stream input, IList<RouteQualityRecord> records)
+    public async Task<GpxData> MarkupTrack(Stream input, IList<RouteQualityRecord> records, Func<double, Task>? updateProgressAction = null)
     {
         if (!await GpxData.CanRead(input))
         {
@@ -45,10 +45,10 @@ public class TrackAnalyzer : ITrackAnalyzer
         records = records.OrderBy(r => r.Date).ToList();
         records = FlattenRouteQualityRecords(records);
 
-        var task = new Task<List<GpxTrack>>(() => SplitTracks(gpxData.Tracks[0], waypoints, records));
+        var task = new Task<Task<List<GpxTrack>>>(async () => await SplitTracks(gpxData.Tracks[0], waypoints, records, updateProgressAction));
         task.Start();
-
-        var tracks = await task.WaitAsync(new CancellationToken());
+        
+        var tracks = await task.Unwrap().WaitAsync(new CancellationToken());
         gpxData.Tracks = tracks;
 
         return gpxData;
@@ -84,7 +84,8 @@ public class TrackAnalyzer : ITrackAnalyzer
         return updatedRecords;
     }
 
-    private static List<GpxTrack> SplitTracks(GpxTrack originalTrack, List<GpxWaypoint> wayPoints, ICollection<RouteQualityRecord> records)
+    private static async Task<List<GpxTrack>> SplitTracks(GpxTrack originalTrack, List<GpxWaypoint> wayPoints,
+        ICollection<RouteQualityRecord> records, Func<double, Task>? updateProgressAction)
     {
         records.Add(new RouteQualityRecord
         {
@@ -94,19 +95,34 @@ public class TrackAnalyzer : ITrackAnalyzer
 
         var newTracks = new List<GpxTrack>();
 
+        double recordsCount = records.Count;
         var previousRouteQuality = RouteQualityEnum.Unknown;
-        foreach (var qualityRecord in records)
+
+        foreach (var item in records.Select((qualityRecord, index) => (qualityRecord, index)))
         {
+            var progressAfterProcessingItem = (item.index + 1) / recordsCount;
             var trackQuality = previousRouteQuality;
-            previousRouteQuality = qualityRecord.RouteQuality;
+            previousRouteQuality = item.qualityRecord.RouteQuality;
 
-            var newTrack = GetTrackWithPointsBefore(qualityRecord.Date, wayPoints, originalTrack);
+            var newTrack = GetTrackWithPointsBefore(item.qualityRecord.Date, wayPoints, originalTrack);
 
-            if (newTrack is null) continue;
+            if (newTrack is null)
+            {
+                if (updateProgressAction is not null)
+                {
+                    await updateProgressAction.Invoke(progressAfterProcessingItem);
+                }
+
+                continue;
+            }
 
             newTrack.TrackQuality = trackQuality;
             newTrack.Name = trackQuality.ToString();
             newTracks.Add(newTrack);
+            if (updateProgressAction is not null)
+            {
+                await updateProgressAction.Invoke(progressAfterProcessingItem);
+            }
         }
 
         return newTracks;

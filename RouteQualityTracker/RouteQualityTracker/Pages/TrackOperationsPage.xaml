@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RouteQualityTracker.Pages.TrackOperationsPage"
-             Title="TrackOperationsPage">
+             Title="Track operations">
     <ScrollView>
         <VerticalStackLayout Padding="30" Spacing="10">
             <Button x:Name="resetBtn"
@@ -36,7 +36,17 @@
                     Placeholder="Load route quality data"
                     HeightRequest="250"
                     AutoSize="TextChanges"
-                    IsReadOnly="True" />
+                    IsReadOnly="True"
+                    IsVisible="True" />
+
+            <Label x:Name="processingLabel"
+                Text="Processing data, it may take a while..." 
+                VerticalOptions="Center"
+                IsVisible="False" />
+
+            <ProgressBar x:Name="progressBar"
+                         Progress="0"
+                         IsVisible="False" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

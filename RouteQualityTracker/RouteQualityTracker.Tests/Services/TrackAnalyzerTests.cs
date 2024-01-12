@@ -7,6 +7,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Moq;
 
 namespace RouteQualityTracker.Tests.Services;
 
@@ -127,6 +128,45 @@ public class TrackAnalyzerTests
         var result = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints);
 
         result.Tracks.Count.Should().Be(2);
+    }
+
+    [Test]
+    public async Task MarkupTrack_CallsUpdateProgressAction()
+    {
+        using var inputStream = PrepareGpxXml(
+            new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
+            new DateTime(2023, 12, 16, 09, 12, 0, DateTimeKind.Utc));
+
+        var qualityPoints = new List<RouteQualityRecord>
+        {
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 10, 0, DateTimeKind.Utc),
+                RouteQuality = RouteQualityEnum.Standard
+            },
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 11, 0, DateTimeKind.Utc),
+                RouteQuality = RouteQualityEnum.Bad
+            },
+            new()
+            {
+                Date = new DateTime(2023, 12, 16, 09, 11, 30, DateTimeKind.Utc),
+                RouteQuality = RouteQualityEnum.Standard
+            },
+        };
+
+        var actionStub = new Mock<Func<double, Task>>();
+        _ = await _trackAnalyzer.MarkupTrack(inputStream, qualityPoints, actionStub.Object);
+
+        actionStub.Verify(a => a.Invoke(It.IsAny<double>()), Times.Exactly(4),
+            "Update progress action should be called exactly 4 times (number of quality records after filtering + 1)");
+
+        actionStub.Verify(a => a.Invoke(0.25));
+        actionStub.Verify(a => a.Invoke(0.50));
+        actionStub.Verify(a => a.Invoke(0.75));
+        actionStub.Verify(a => a.Invoke(1));
     }
 
     // See https://osmand.net/docs/technical/osmand-file-formats/osmand-gpx#track-appearance

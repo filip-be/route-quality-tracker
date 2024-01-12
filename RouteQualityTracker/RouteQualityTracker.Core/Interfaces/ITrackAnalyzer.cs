@@ -7,5 +7,5 @@ public interface ITrackAnalyzer
 {
     TimeSpan MinimumQualityRecordTimeDifference { get; set; }
 
-    Task<GpxData> MarkupTrack(Stream input, IList<RouteQualityRecord> records);
+    Task<GpxData> MarkupTrack(Stream input, IList<RouteQualityRecord> records, Func<double, Task>? updateProgressAction = null);
 }
