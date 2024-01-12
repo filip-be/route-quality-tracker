@@ -6,7 +6,7 @@ namespace RouteQualityTracker.Core.Gpx;
 public class GpxTrack : IGpxObject
 {
     private readonly XElement _gpxElement;
-    private readonly string _gpxNamespace;
+    private readonly XNamespace _gpxNamespace;
 
     public IList<GpxWaypoint> WayPoints
     {
@@ -15,6 +15,11 @@ public class GpxTrack : IGpxObject
         {
             var oldWayPoints = _gpxElement.XPathSelectElements<GpxWaypoint>("//trkpt", _gpxNamespace);
             oldWayPoints?.ForEach(w => w.RemoveFromParent());
+
+            //var trackSegment = _gpxElement.XPathSelectElement("trkseg", _gpxNamespace);
+            //if (trackSegment is null)
+            //{
+            //}
 
             value.ToList().ForEach(t => _gpxElement.Add(t.ToXElement()));
         }
@@ -52,15 +57,14 @@ public class GpxTrack : IGpxObject
 
             if (colorElement is null)
             {
-                XNamespace xNamespace = _gpxNamespace;
                 var extensionsElement = _gpxElement.Element("extensions", _gpxNamespace);
                 if (extensionsElement is null)
                 {
-                    extensionsElement = new XElement(xNamespace + "extensions");
+                    extensionsElement = new XElement(_gpxNamespace + "extensions");
                     _gpxElement.Add(extensionsElement);
                 }
 
-                colorElement = new XElement(xNamespace + "color");
+                colorElement = new XElement(_gpxNamespace + "color");
                 extensionsElement.Add(colorElement);
             }
 
@@ -74,7 +78,7 @@ public class GpxTrack : IGpxObject
         }
     }
 
-    public GpxTrack(XElement node, string gpxNamespace)
+    public GpxTrack(XElement node, XNamespace gpxNamespace)
     {
         _gpxElement = node;
         _gpxNamespace = gpxNamespace;

@@ -118,7 +118,12 @@ public class TrackAnalyzer : ITrackAnalyzer
             ? wayPoints.IndexOf(firstNotMatchingPoint)
             : wayPoints.Count - 1;
 
-        var trackWayPoints = wayPoints.Any() ? wayPoints[..firstNotMatchingPointIndex] : new List<GpxWaypoint>();
+        var trackWayPoints = wayPoints.Any()
+            ? wayPoints[..firstNotMatchingPointIndex]
+            : new List<GpxWaypoint>
+            {
+                Capacity = 0
+            };
 
         if (trackWayPoints.Count == 0) return null;
 

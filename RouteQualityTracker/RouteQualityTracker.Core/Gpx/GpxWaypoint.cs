@@ -5,7 +5,7 @@ namespace RouteQualityTracker.Core.Gpx;
 public class GpxWaypoint : IGpxObject
 {
     private readonly XElement _gpxElement;
-    private readonly string _gpxNamespace;
+    private readonly XNamespace _gpxNamespace;
 
     public DateTimeOffset? TimeUtc
     {
@@ -21,7 +21,7 @@ public class GpxWaypoint : IGpxObject
         }
     }
 
-    public GpxWaypoint(XElement node, string gpxNamespace)
+    public GpxWaypoint(XElement node, XNamespace gpxNamespace)
     {
         _gpxElement = node;
         _gpxNamespace = gpxNamespace;

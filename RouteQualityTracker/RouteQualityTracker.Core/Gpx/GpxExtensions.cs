@@ -26,7 +26,7 @@ public static class GpxExtensions
         var elements = new List<T>();
         foreach (var node in nodes)
         {
-            var element = (T)Activator.CreateInstance(typeof(T), node, xNamespace.ToString())!;
+            var element = (T)Activator.CreateInstance(typeof(T), node, xNamespace)!;
             elements.Add(element);
         }
         return elements;
