@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "routequalitytracker.web", "RouteQualityTracker.Web\routequalitytracker.web.esproj", "{7B5534EF-78CF-47AE-908B-4767DBBCE6BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,12 @@ Global
 		{6C2978CB-1931-4932-B796-C3E6C9E9AB5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C2978CB-1931-4932-B796-C3E6C9E9AB5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C2978CB-1931-4932-B796-C3E6C9E9AB5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B5534EF-78CF-47AE-908B-4767DBBCE6BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B5534EF-78CF-47AE-908B-4767DBBCE6BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B5534EF-78CF-47AE-908B-4767DBBCE6BF}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{7B5534EF-78CF-47AE-908B-4767DBBCE6BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B5534EF-78CF-47AE-908B-4767DBBCE6BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B5534EF-78CF-47AE-908B-4767DBBCE6BF}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
