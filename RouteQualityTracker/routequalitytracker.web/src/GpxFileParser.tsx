@@ -1,10 +1,6 @@
-import { useEffect, useState } from "react";
+import { LatLng } from "leaflet";
 
-type TrackPoint = {
-  lat: string;
-  lon: string;
-  ele: number;
-};
+type TrackPoint = LatLng;
 
 type Track = {
   color: string;
@@ -13,7 +9,7 @@ type Track = {
 
 export type GpxFile = {
   name: string;
-  Tracks: Track[];
+  tracks: Track[];
 };
 
 export function parseGpx(gpxData: Document): GpxFile {
@@ -26,20 +22,45 @@ export function parseGpx(gpxData: Document): GpxFile {
 
   const tracks = Array.from(
     gpxData.getElementsByTagNameNS(gpxNamespace, "trk")
-  ).map((trackEl) => {
+  ).map((trackEl): Track => {
     const extensionsEl = trackEl.getElementsByTagNameNS(
       gpxNamespace,
       "extensions"
     );
-    const colorEl;
-  });
-  tracks.map;
-  //   .map((trackEl) => {
+    const colorEl =
+      extensionsEl.length > 0
+        ? extensionsEl[0].getElementsByTagNameNS(gpxStyleNamespace, "color")
+        : undefined;
+    const color =
+      colorEl !== undefined && colorEl.length > 0
+        ? `#${colorEl[0].childNodes[0].nodeValue as string}`
+        : "#FFFFFF";
 
-  //   });
+    const trackPoints = Array.from(
+      trackEl.getElementsByTagNameNS(gpxNamespace, "trkpt")
+    ).map((el): TrackPoint => {
+      const eleElement = el.getElementsByTagNameNS(gpxNamespace, "ele");
+      const latitudeString = el.getAttribute("lat")!;
+      const longitudeString = el.getAttribute("lon")!;
+
+      return new LatLng(
+        Number.parseFloat(latitudeString),
+        Number.parseFloat(longitudeString),
+        eleElement?.length > 0
+          ? Number.parseInt(eleElement[0].childNodes[0].nodeValue as string)
+          : undefined
+      );
+    });
+
+    return {
+      color: color,
+      points: trackPoints,
+    };
+  });
 
   return {
     name: name,
+    tracks: tracks,
   };
 }
 

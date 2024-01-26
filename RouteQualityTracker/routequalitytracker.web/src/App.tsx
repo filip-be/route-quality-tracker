@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import GpxFileContent from "./assets/track.gpx?raw";
+import { MapContainer, Polyline, TileLayer } from "react-leaflet";
+import GpxFileContent from "./assets/track2.gpx?raw";
 import { GpxFile, parseGpx } from "./GpxFileParser";
 
 function App() {
@@ -24,20 +24,26 @@ function App() {
           <h2>{gpxFile.name}</h2>
           <MapContainer
             id="map"
-            center={[51.505, -0.09]}
+            center={gpxFile.tracks[0].points[0]}
             zoom={10}
-            scrollWheelZoom={false}
+            scrollWheelZoom={true}
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            <Marker position={[51.505, -0.09]}>
-              <Popup>
-                A pretty CSS3 popup. <br /> Easily customizable.
-              </Popup>
-            </Marker>
+            {gpxFile.tracks.map((t, index) => {
+              return (
+                <Polyline
+                  key={`track${index}`}
+                  positions={t.points}
+                  pathOptions={{
+                    color: t.color,
+                  }}
+                />
+              );
+            })}
           </MapContainer>
         </>
       ) : (
