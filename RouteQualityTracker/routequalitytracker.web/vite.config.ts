@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   assetsInclude: ["**/*.gpx"],
+  base: "/route-quality-tracker/",
   test: {
     globals: true,
     environment: "jsdom",
