@@ -3,12 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://filip-be.github.io/oute-quality-tracker/",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "@raruto/leaflet-elevation": "^2.5.1",
