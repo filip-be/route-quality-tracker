@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "homepage": "https://filip-be.github.io/oute-quality-tracker/",
+  "homepage": "https://filip-be.github.io/route-quality-tracker/",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
