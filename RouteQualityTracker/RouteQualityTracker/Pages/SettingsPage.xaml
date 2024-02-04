@@ -47,10 +47,15 @@
                             Margin="0, 10"
                             HeightRequest="1" 
                             Color="LightGray"/>
+
+                        <Label x:Name="inputDeviceToggleDisabledLabel"
+                               IsVisible="False"
+                               FontAttributes="Bold"
+                               Text="Service must be stopped to modify input settings" />
                     </VerticalStackLayout>
                 </toolkit:Expander.Header>
                 <VerticalStackLayout Padding="10" Spacing="5">
-                    <Grid>
+                    <Grid x:Name="inputOptionsGrid">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
@@ -59,6 +64,7 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="50"/>
                         </Grid.ColumnDefinitions>
+                        
                         <Label Text="Use headset" VerticalOptions="Center" Grid.Column="0"/>
                         <Switch x:Name="useHeadset"
                                 Toggled="OnUseHeadsetToggled"

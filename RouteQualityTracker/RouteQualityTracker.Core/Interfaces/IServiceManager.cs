@@ -4,6 +4,8 @@ public interface IServiceManager
 {
     void ToggleService();
 
+    bool IsRunning { get; }
+
     void SetStatus(bool isRunning, Exception? ex = null);
 
     event EventHandler OnServiceStart;

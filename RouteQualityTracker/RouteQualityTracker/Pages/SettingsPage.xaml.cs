@@ -1,4 +1,5 @@
 using CommunityToolkit.Maui.Alerts;
+using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
 using RouteQualityTracker.Services;
@@ -11,21 +12,26 @@ public partial class SettingsPage : ContentPage
     public const string ChevronDownIcon = "chevron_down.png";
 
     private readonly ISettingsService _settingsService;
+    private readonly IServiceManager _serviceManager;
 
     public SettingsPage()
     {
         InitializeComponent();
         _settingsService = ServiceHelper.GetService<ISettingsService>();
+        _serviceManager = ServiceHelper.Services.GetService<IServiceManager>()!;
     }
 
     protected override void OnAppearing()
     {
+        inputOptionsGrid.IsEnabled = !_serviceManager.IsRunning;
+
         if (!useHeadset.IsEnabled)
         {
             LoadSettings();
 
             useHeadset.IsEnabled = true;
             useMediaControls.IsEnabled = true;
+            useCustomDevice.IsEnabled = false;
             sendSmsSwitch.IsEnabled = true;
             sendEmailsSwitch.IsEnabled = true;
         }

@@ -4,11 +4,11 @@ namespace RouteQualityTracker.Core.Services;
 
 public class ServiceManager : IServiceManager
 {
-    internal bool IsServiceRunning { get; set; }
+    public bool IsRunning { get; internal set; }
 
     public void ToggleService()
     {
-        if (IsServiceRunning)
+        if (IsRunning)
         {
             OnServiceStop?.Invoke(this, null!);
         }
@@ -20,9 +20,9 @@ public class ServiceManager : IServiceManager
 
     public void SetStatus(bool isRunning, Exception? ex = null)
     {
-        IsServiceRunning = isRunning;
+        IsRunning = isRunning;
 
-        if (IsServiceRunning)
+        if (IsRunning)
         {
             OnServiceStarted?.Invoke(this, null!);
         }

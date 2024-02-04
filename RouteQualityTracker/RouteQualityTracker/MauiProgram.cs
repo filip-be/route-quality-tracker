@@ -35,6 +35,7 @@ public static class MauiProgram
 
 #if ANDROID
         builder.Services.AddSingleton<MainActivity>();
+        builder.Services.AddScoped<IAndroidNotificationService, AndroidNotificationService>();
 #endif
 
 #if DEBUG

@@ -22,7 +22,7 @@ public class ServiceManagerTests
     {
         _serviceManager.SetStatus(isRunning);
 
-        (_serviceManager as ServiceManager)!.IsServiceRunning.Should().Be(isRunning);
+        (_serviceManager as ServiceManager)!.IsRunning.Should().Be(isRunning);
     }
 
     [Test]
