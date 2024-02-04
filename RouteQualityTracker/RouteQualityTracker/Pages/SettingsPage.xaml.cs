@@ -43,6 +43,7 @@ public partial class SettingsPage : ContentPage
     {
         useHeadset.IsToggled = _settingsService.Settings.UseHeadset;
         useMediaControls.IsToggled = _settingsService.Settings.UseMediaControls;
+        useCustomDevice.IsToggled = _settingsService.Settings.UseCustomDevice;
         sendSmsSwitch.IsToggled = _settingsService.Settings.SendSms;
         smsNumber.Text = _settingsService.Settings.SmsNumber;
         sendEmailsSwitch.IsToggled = _settingsService.Settings.SendEmail;
@@ -61,6 +62,7 @@ public partial class SettingsPage : ContentPage
         {
             UseHeadset = useHeadset.IsToggled,
             UseMediaControls = useMediaControls.IsToggled,
+            UseCustomDevice = useCustomDevice.IsToggled,
             SendSms = sendSmsSwitch.IsToggled,
             SmsNumber = smsNumber.Text,
             SendEmail = sendEmailsSwitch.IsToggled,
@@ -93,6 +95,7 @@ public partial class SettingsPage : ContentPage
         if (e.Value)
         {
             useMediaControls.IsToggled = false;
+            useCustomDevice.IsToggled = false;
         }
     }
 
@@ -100,6 +103,16 @@ public partial class SettingsPage : ContentPage
     {
         if (e.Value)
         {
+            useHeadset.IsToggled = false;
+            useCustomDevice.IsToggled = false;
+        }
+    }
+
+    private void OnUseCustomDeviceToggled(object sender, ToggledEventArgs e)
+    {
+        if (e.Value)
+        {
+            useMediaControls.IsToggled = false;
             useHeadset.IsToggled = false;
         }
     }

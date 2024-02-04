@@ -14,6 +14,7 @@ public interface ISettingsService
     const string SentToSmtpPortProp = "SentToSmtpPort";
     const string UseHeadsetProp = "UseHeadset";
     const string UseMediaControlsProp = "UseMediaControls";
+    const string UseCustomDeviceProp = "UseCustomDevice";
 
     AppSettings Settings { get; }
 

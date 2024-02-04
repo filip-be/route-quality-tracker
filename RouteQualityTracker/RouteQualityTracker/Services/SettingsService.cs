@@ -30,6 +30,7 @@ public class SettingsService : ISettingsService
     {
         Preferences.Default.Set(ISettingsService.UseHeadsetProp, newSettings.UseHeadset);
         Preferences.Default.Set(ISettingsService.UseMediaControlsProp, newSettings.UseMediaControls);
+        Preferences.Default.Set(ISettingsService.UseCustomDeviceProp, newSettings.UseCustomDevice);
         Preferences.Default.Set(ISettingsService.SendSmsProp, newSettings.SendSms);
         Preferences.Default.Set(ISettingsService.SendSmsNumberProp, newSettings.SmsNumber);
         Preferences.Default.Set(ISettingsService.SendEmailsProp, newSettings.SendEmail);
@@ -41,6 +42,7 @@ public class SettingsService : ISettingsService
 
         _settings.UseHeadset = newSettings.UseHeadset;
         _settings.UseMediaControls = newSettings.UseMediaControls;
+        _settings.UseCustomDevice = newSettings.UseCustomDevice;
         _settings.SendSms = newSettings.SendSms;
         _settings.SmsNumber = newSettings.SmsNumber;
         _settings.SendEmail = newSettings.SendEmail;
@@ -55,6 +57,7 @@ public class SettingsService : ISettingsService
     {
         _settings.UseHeadset = Preferences.Default.Get(ISettingsService.UseHeadsetProp, false);
         _settings.UseMediaControls = Preferences.Default.Get(ISettingsService.UseMediaControlsProp, false);
+        _settings.UseCustomDevice = Preferences.Default.Get(ISettingsService.UseCustomDeviceProp, false);
         _settings.SendSms = Preferences.Default.Get(ISettingsService.SendSmsProp, false);
         _settings.SmsNumber = Preferences.Default.Get(ISettingsService.SendSmsNumberProp, string.Empty);
         _settings.SendEmail = Preferences.Default.Get(ISettingsService.SendEmailsProp, false);

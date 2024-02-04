@@ -21,4 +21,6 @@ public class AppSettings
     public bool UseHeadset { get; set; }
 
     public bool UseMediaControls { get; set; }
+
+    public bool UseCustomDevice { get; set; }
 }
