@@ -31,7 +31,7 @@ public partial class SettingsPage : ContentPage
 
             useHeadset.IsEnabled = true;
             useMediaControls.IsEnabled = true;
-            useCustomDevice.IsEnabled = false;
+            useCustomDevice.IsEnabled = true;
             sendSmsSwitch.IsEnabled = true;
             sendEmailsSwitch.IsEnabled = true;
         }

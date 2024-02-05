@@ -61,6 +61,6 @@ public class MainActivity : MauiAppCompatActivity
             return new Intent(this, typeof(MediaButtonHandlerService));
         }
 
-        throw new NotImplementedException();
+        throw new NotImplementedException("Please select input device");
     }
 }

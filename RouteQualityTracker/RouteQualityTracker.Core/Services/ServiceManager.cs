@@ -36,9 +36,15 @@ public class ServiceManager : IServiceManager
         }
     }
 
+    public void DisplayMessage(string message)
+    {
+        OnDisplayMessage?.Invoke(this, message);
+    }
+
     public event EventHandler? OnServiceStart;
     public event EventHandler? OnServiceStop;
     public event EventHandler? OnServiceStarted;
     public event EventHandler? OnServiceStopped;
     public event EventHandler<Exception>? OnServiceStartError;
+    public event EventHandler<string>? OnDisplayMessage;
 }

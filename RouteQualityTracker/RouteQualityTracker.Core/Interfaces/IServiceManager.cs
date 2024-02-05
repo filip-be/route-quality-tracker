@@ -8,6 +8,8 @@ public interface IServiceManager
 
     void SetStatus(bool isRunning, Exception? ex = null);
 
+    void DisplayMessage(string message);
+
     event EventHandler OnServiceStart;
 
     event EventHandler OnServiceStarted;
@@ -17,4 +19,6 @@ public interface IServiceManager
     event EventHandler OnServiceStopped;
 
     event EventHandler<Exception> OnServiceStartError;
+
+    event EventHandler<string>? OnDisplayMessage;
 }

@@ -4,6 +4,7 @@ using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
 using RouteQualityTracker.Pages;
+using RouteQualityTracker.Platforms.Android;
 using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker;
