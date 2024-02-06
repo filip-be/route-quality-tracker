@@ -21,15 +21,23 @@ public partial class MainPage : ContentPage
         _serviceManager.OnServiceStarted += OnServiceStarted;
         _serviceManager.OnServiceStopped += OnServiceStopped;
         _serviceManager.OnServiceStartError += OnServiceStartError;
+        _serviceManager.OnDisplayMessage += OnDisplayMessage;
     }
 
-    private void OnServiceStartError(object? sender, Exception ex)
+    private void OnDisplayMessage(object? _, string message)
+    {
+        Toast.Make(message).Show();
+    }
+
+    private void OnServiceStartError(object? _, Exception ex)
     {
         Toast.Make($"Error starting service: {ex.Message}", ToastDuration.Long).Show();
     }
 
     private void OnServiceStopped(object? sender, EventArgs e)
     {
+        ToggleServiceBtn.IsEnabled = true;
+
         ToggleServiceBtn.Text = "Start service";
         _qualityTrackingService.StopTracking();
 
@@ -39,6 +47,8 @@ public partial class MainPage : ContentPage
 
     private void OnServiceStarted(object? sender, EventArgs e)
     {
+        ToggleServiceBtn.IsEnabled = true;
+
         ToggleServiceBtn.Text = "Stop service";
         _qualityTrackingService.StartTracking();
 
@@ -48,6 +58,7 @@ public partial class MainPage : ContentPage
 
     private void OnToggleServiceClicked(object sender, EventArgs e)
     {
+        //ToggleServiceBtn.IsEnabled = false;
         _serviceManager.ToggleService();
     }
 

@@ -4,7 +4,6 @@ using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
 using RouteQualityTracker.Pages;
-using RouteQualityTracker.Platforms.Android;
 using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker;
@@ -36,7 +35,8 @@ public static class MauiProgram
 
 #if ANDROID
         builder.Services.AddSingleton<MainActivity>();
-        builder.Services.AddScoped<IAndroidNotificationService, AndroidNotificationService>();
+        builder.Services.AddScoped<RouteQualityTracker.Platforms.Android.IAndroidNotificationService, 
+            RouteQualityTracker.Platforms.Android.AndroidNotificationService>();
 #endif
 
 #if DEBUG

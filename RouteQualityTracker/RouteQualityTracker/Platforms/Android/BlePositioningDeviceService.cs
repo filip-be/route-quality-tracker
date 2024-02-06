@@ -1,13 +1,18 @@
 ﻿using Android.App;
 using Android.Bluetooth;
 using Android.Bluetooth.LE;
+using Android.Companion;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
+using AndroidX.Concurrent.Futures;
+using Java.Lang;
 using Java.Util;
+using Microsoft.Maui.Platform;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Services;
+using AndroidActivity = Android.App.Activity;
 
 namespace RouteQualityTracker.Platforms.Android;
 
@@ -58,65 +63,65 @@ public class BlePositioningDeviceService : Service
 
         // look for BLE Device before starting foreground service
 
-        var bluetoothManager = (BluetoothManager?)GetSystemService(BluetoothService);
-        if(bluetoothManager is null)
-        {
-            _serviceManager.SetStatus(false, new InvalidOperationException("Bluetooth service is not available"));
-            return StartCommandResult.NotSticky;
-        }
-
-        var bluetoothAdapter = bluetoothManager.Adapter;
-        if (bluetoothAdapter is null)
-        {
-            _serviceManager.SetStatus(false, new InvalidOperationException("Bluetooth adapter is not available"));
-            return StartCommandResult.NotSticky;
-        }
-
-        var bleScanner = bluetoothAdapter.BluetoothLeScanner;
-        if (bleScanner is null)
-        {
-            _serviceManager.SetStatus(false, new InvalidOperationException("Bluetooth LE scanner is not available"));
-            return StartCommandResult.NotSticky;
-        }
-
-        _serviceManager.DisplayMessage("Looking for position quality tracking device");
-        //bleScanner.StartScan(_bleScanCallback);
-        bleScanner.StartScan(new List<ScanFilter> {
-            new ScanFilter
-                .Builder()
-                .SetDeviceName("RouteQualityTracker Device")
-                //.SetServiceUuid(
-                //    new ParcelUuid(new UUID(0x1800L, -1L)))
-                !.Build()! },
-            new ScanSettings
-                .Builder()
-                .Build(),
-            _bleScanCallback);
-
-        //var deviceFilter = new BluetoothLeDeviceFilter.Builder()
-        //    //.SetNamePattern("RouteQualityTracker Device")
-        //    .SetScanFilter(new ScanFilter
-        //        .Builder()
-        //        .SetServiceUuid(new ParcelUuid(new UUID(0x1801L, -1L)))!
-        //        .Build()
-        //    )
-        //    .Build();
-
-        //var pairingRequest = new AssociationRequest.Builder()
-        //    .AddDeviceFilter(deviceFilter)
-        //    .SetSingleDevice(true)
-        //    .Build();
-
-        //var deviceManager = (CompanionDeviceManager)GetSystemService(CompanionDeviceService)!;
-
-
-
-        //if (OperatingSystem.IsAndroidVersionAtLeast(33))
+        //var bluetoothManager = (BluetoothManager?)GetSystemService(BluetoothService);
+        //if(bluetoothManager is null)
         //{
-
-
-        //    deviceManager.Associate(pairingRequest, DirectExecutor.Instance, new CompanionDeviceManager.Callback()
+        //    _serviceManager.SetStatus(false, new InvalidOperationException("Bluetooth service is not available"));
+        //    return StartCommandResult.NotSticky;
         //}
+
+        //var bluetoothAdapter = bluetoothManager.Adapter;
+        //if (bluetoothAdapter is null)
+        //{
+        //    _serviceManager.SetStatus(false, new InvalidOperationException("Bluetooth adapter is not available"));
+        //    return StartCommandResult.NotSticky;
+        //}
+
+        //var bleScanner = bluetoothAdapter.BluetoothLeScanner;
+        //if (bleScanner is null)
+        //{
+        //    _serviceManager.SetStatus(false, new InvalidOperationException("Bluetooth LE scanner is not available"));
+        //    return StartCommandResult.NotSticky;
+        //}
+
+        //_serviceManager.DisplayMessage("Looking for position quality tracking device");
+        ////bleScanner.StartScan(_bleScanCallback);
+        //bleScanner.StartScan(new List<ScanFilter> {
+        //    new ScanFilter
+        //        .Builder()
+        //        .SetDeviceName("RouteQualityTracker Device")
+        //        //.SetServiceUuid(
+        //        //    new ParcelUuid(new UUID(0x1800L, -1L)))
+        //        !.Build()! },
+        //    new ScanSettings
+        //        .Builder()
+        //        .Build(),
+        //    _bleScanCallback);
+
+        var deviceFilter = new BluetoothLeDeviceFilter.Builder()
+            //.SetNamePattern("RouteQualityTracker Device")
+            .SetScanFilter(new ScanFilter
+                .Builder()
+                .SetServiceUuid(new ParcelUuid(new UUID(0x1801L, -1L)))!
+                .Build()
+            )
+            .Build();
+
+        var pairingRequest = new AssociationRequest.Builder()
+            .AddDeviceFilter(deviceFilter)
+            .SetSingleDevice(true)
+            .Build();
+
+        var deviceManager = (CompanionDeviceManager)GetSystemService(CompanionDeviceService)!;
+
+        if (OperatingSystem.IsAndroidVersionAtLeast(33))
+        {
+            deviceManager.Associate(pairingRequest, DirectExecutor.Instance!, new AssociationCallback(_serviceManager, this.GetActivity()!));
+        }
+        else
+        {
+            deviceManager.Associate(pairingRequest, new AssociationCallback(_serviceManager, this.GetActivity()!), null);
+        }
         ////deviceManager.Associate()
 
         if (OperatingSystem.IsAndroidVersionAtLeast(29))
@@ -133,6 +138,47 @@ public class BlePositioningDeviceService : Service
         _serviceManager.SetStatus(true);
 
         return StartCommandResult.NotSticky;
+    }
+
+    class AssociationCallback(IServiceManager serviceManager, AndroidActivity activity) : CompanionDeviceManager.Callback
+    {
+        const int SELECT_DEVICE_REQUEST_CODE = 0;
+
+        public override void OnAssociationPending(IntentSender intentSender)
+        {
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
+            {
+                base.OnAssociationPending(intentSender);
+            }
+
+            activity.StartIntentSenderForResult(intentSender, SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0);
+        }
+
+        public override void OnDeviceFound(IntentSender intentSender)
+        {
+            if (!OperatingSystem.IsAndroidVersionAtLeast(33))
+            {
+                base.OnDeviceFound(intentSender);
+            }
+
+            activity.StartIntentSenderForResult(intentSender, SELECT_DEVICE_REQUEST_CODE, null, 0, 0, 0);
+        }
+
+        public override void OnAssociationCreated(AssociationInfo associationInfo)
+        {
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
+            {
+                base.OnAssociationCreated(associationInfo);
+
+                var deviceName = associationInfo.DisplayName;
+                serviceManager.DisplayMessage($"Associated with {deviceName}");
+            }
+        }
+
+        public override void OnFailure(ICharSequence? error)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class BleScanCallback(IServiceManager serviceManager, Context context) : ScanCallback
