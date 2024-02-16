@@ -116,8 +116,9 @@ void setup() {
 
   //0x1801
 
+  int32_t serviceId;
   /* Setup as Generic Attribute Service (0x1801) */
-  if (! ble.sendCommandCheckOK(F( "AT+GATTADDSERVICE=UUID=0x1801"  ))) {
+  if (! ble.sendCommandWithIntReply(F( "AT+GATTADDSERVICE=UUID=0x1801" ), &serviceId)) {
     error(F("Could not setup Generic Attribute Service for GATT - 0x1801"));
   }
 
@@ -127,13 +128,22 @@ void setup() {
   //   error(F("Couldn't reset??"));
   // }
 
+  int32_t characteristicId;
   Serial.println(F("Adding position characteristic - 0x2A69"));
-  if (! ble.sendCommandCheckOK(F( "AT+GATTADDCHAR=UUID=0x2A67,PROPERTIES=0x10,MIN_LEN=1,VALUE=-100" ))) {
+  if (! ble.sendCommandWithIntReply(F( "AT+GATTADDCHAR=UUID=0x2A69,PROPERTIES=0x12,MIN_LEN=1,MAX_LEN=1,VALUE=0,DATATYPE=3,DESCRIPTION=Positioning characteristic" ), &characteristicId)) {
     error(F("Couldn't set position characteristic"));
   }
 
   Serial.println(F("Listing all GATT services and characteristics configuration"));
-  ble.println(F( "AT+GATTLIST" ));
+  ble.sendCommandCheckOK(F( "AT+GATTLIST" ));
+
+  /* Reset the device for the new service setting changes to take effect */
+  Serial.println(F("Performing a SW reset (service changes require a reset): "));
+  if (! ble.reset() ) {
+    error(F("Couldn't reset??"));
+  }
+
+  Serial.println();
 }
 
 void waitForButtonPress() {
@@ -157,21 +167,21 @@ void setStatusAndWaitForButtonPress(const uint8_t ledPin) {
   switch (ledPin) {
     case LED_RED:
       Serial.println(F("Setting status to Bad"));
-      if (!ble.sendCommandCheckOK(F("AT+GATTCHAR=1,-1"))) {
+      if (!ble.sendCommandCheckOK(F("AT+GATTCHAR=1,10"))) {
         error(F("Error sending command"));
         return;
       }
       break;
     case LED_YELLOW:
       Serial.println(F("Setting status to Standard"));
-      if (!ble.sendCommandCheckOK(F("AT+GATTCHAR=1,0"))) {
+      if (!ble.sendCommandCheckOK(F("AT+GATTCHAR=1,20"))) {
         error(F("Error sending command"));
         return;
       }
       break;
     case LED_GREEN:
       Serial.println(F("Setting status to Good"));
-      if (!ble.sendCommandCheckOK(F("AT+GATTCHAR=1,1"))) {
+      if (!ble.sendCommandCheckOK(F("AT+GATTCHAR=1,30"))) {
         error(F("Error sending command"));
         return;
       }
@@ -182,6 +192,8 @@ void setStatusAndWaitForButtonPress(const uint8_t ledPin) {
   }
 
   lightLed(ledPin);
+  Serial.println("Checking current characteristic value");
+  ble.sendCommandCheckOK("AT+GATTCHAR=1");
   waitForButtonPress();
 }
 

@@ -1,16 +1,11 @@
-﻿using _Microsoft.Android.Resource.Designer;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.Media.Session;
 using Android.OS;
 using Android.Runtime;
-using Android.Telephony;
-using AndroidX.Core.App;
 using RouteQualityTracker.Core.Interfaces;
-using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
-using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker.Platforms.Android;
 

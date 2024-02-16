@@ -10,14 +10,8 @@ using RouteQualityTracker.Services;
 namespace RouteQualityTracker.Platforms.Android;
 public class MediaSessionCallback : MediaSession.Callback
 {
-    private readonly IQualityTrackingService _qualityTrackingService;
-    private readonly ISettingsService _settingsService;
-
-    public MediaSessionCallback()
-    {
-        _qualityTrackingService = ServiceHelper.GetService<IQualityTrackingService>();
-        _settingsService = ServiceHelper.GetService<ISettingsService>();
-    }
+    private readonly IQualityTrackingService _qualityTrackingService = ServiceHelper.GetService<IQualityTrackingService>();
+    private readonly ISettingsService _settingsService = ServiceHelper.GetService<ISettingsService>();
 
     public override bool OnMediaButtonEvent(Intent mediaButtonIntent)
     {

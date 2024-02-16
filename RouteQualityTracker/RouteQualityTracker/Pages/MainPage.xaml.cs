@@ -26,34 +26,42 @@ public partial class MainPage : ContentPage
 
     private void OnDisplayMessage(object? _, string message)
     {
-        Toast.Make(message).Show();
+        MainThread.BeginInvokeOnMainThread(() => Toast.Make(message).Show());
     }
 
     private void OnServiceStartError(object? _, Exception ex)
     {
-        Toast.Make($"Error starting service: {ex.Message}", ToastDuration.Long).Show();
+        MainThread.BeginInvokeOnMainThread(() =>
+            Toast.Make($"Error starting service: {ex.Message}", ToastDuration.Long).Show());
+
     }
 
     private void OnServiceStopped(object? sender, EventArgs e)
     {
-        ToggleServiceBtn.IsEnabled = true;
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            ToggleServiceBtn.IsEnabled = true;
 
-        ToggleServiceBtn.Text = "Start service";
-        _qualityTrackingService.StopTracking();
+            ToggleServiceBtn.Text = "Start service";
+            _qualityTrackingService.StopTracking();
 
-        SaveDataBtn.IsEnabled = true;
-        Toast.Make("Service stopped").Show();
+            SaveDataBtn.IsEnabled = true;
+            Toast.Make("Service stopped").Show();
+        });
     }
 
     private void OnServiceStarted(object? sender, EventArgs e)
     {
-        ToggleServiceBtn.IsEnabled = true;
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            ToggleServiceBtn.IsEnabled = true;
 
-        ToggleServiceBtn.Text = "Stop service";
-        _qualityTrackingService.StartTracking();
+            ToggleServiceBtn.Text = "Stop service";
+            _qualityTrackingService.StartTracking();
 
-        SaveDataBtn.IsEnabled = false;
-        Toast.Make("Service started").Show();
+            SaveDataBtn.IsEnabled = false;
+            Toast.Make("Service started").Show();
+        });
     }
 
     private void OnToggleServiceClicked(object sender, EventArgs e)
