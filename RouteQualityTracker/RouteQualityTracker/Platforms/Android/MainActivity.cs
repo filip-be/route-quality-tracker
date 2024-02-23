@@ -62,7 +62,8 @@ public class MainActivity : MauiAppCompatActivity
                 }
 
                 var trackingDevice = bluetoothAdapter.BondedDevices?.FirstOrDefault(d =>
-                    d.Name?.Equals("RouteQualityTracker Device", StringComparison.OrdinalIgnoreCase) == true);
+                    d.Name?.Equals("RouteQualityTracker Device", StringComparison.OrdinalIgnoreCase) == true
+                    || d.Name?.Equals("QualityTracker", StringComparison.OrdinalIgnoreCase) == true);
 
                 if (trackingDevice is null)
                 {
