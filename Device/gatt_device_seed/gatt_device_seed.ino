@@ -7,8 +7,11 @@
 const uint8_t LEDS_ARRAY[3] = { LED_RED, LED_BLUE, LED_GREEN };
 
 BLEDis bledis;
-BLEService bleService(BLEUuid(BLE_APPERANCE_GATT_SERVICE));
+// BLEService bleService(BLEUuid(BLE_APPERANCE_GATT_SERVICE));
 BLECharacteristic positioningCharacteristic(BLEUuid(0x2A69), CharsProperties::CHR_PROPS_NOTIFY | CharsProperties::CHR_PROPS_READ);
+BLEBas batteryService;
+
+uint8_t batteryLevel = 100;
 
 void lightLed(int ledPin) {
   for(int i = 0; i < 3; i++) {
@@ -61,6 +64,13 @@ void setStatusAndWaitForButtonPress(const uint8_t ledPin) {
   }
 
   lightLed(ledPin);
+  char batteryLevelMessage[50];
+  sprintf(batteryLevelMessage, "Setting battery level status to: %u", batteryLevel);
+  serialPrint(batteryLevelMessage);
+  batteryService.write(batteryLevel);
+  batteryService.notify(batteryLevel);
+
+  batteryLevel--;
   // serialPrint("Checking current characteristic value");
   // ble.sendCommandCheckOK("AT+GATTCHAR=1");
   waitForButtonPress();
@@ -91,14 +101,22 @@ void setup() {
 
   Bluefruit.setTxPower(4);
 
-
   // Configure Device Information Service
   bledis.setManufacturer("Cindalnet");
   bledis.setModel("Route Quality Tracking Device");
   bledis.begin();
 
-  // Configure General GATT Service
-  bleService.begin();
+  // // Configure General GATT Service
+  // bleService.begin();
+
+  // Define characteristic
+  positioningCharacteristic.setProperties(CHR_PROPS_NOTIFY | CHR_PROPS_READ);
+  positioningCharacteristic.setPermission(SECMODE_OPEN, SECMODE_NO_ACCESS);
+  positioningCharacteristic.setFixedLen(1);
+  positioningCharacteristic.begin();
+
+  // Configure battery service
+  batteryService.begin();
 
   // Start BLE advertisement
   startAdvertising();
@@ -109,19 +127,15 @@ void startAdvertising()
   // Advertising packet
   Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
   Bluefruit.Advertising.addTxPower();
-  Bluefruit.Advertising.addAppearance(BLE_APPERANCE_GATT_SERVICE);
+  // Bluefruit.Advertising.addAppearance(BLE_APPERANCE_GATT_SERVICE);
   
   // Include General GATT Service
-  Bluefruit.Advertising.addService(bleService);
+  // Bluefruit.Advertising.addService(bleService);
+  Bluefruit.Advertising.addService(batteryService);
   
   // There is enough room for the dev name in the advertising packet
   Bluefruit.setName("QualityTracker");
   Bluefruit.Advertising.addName();
-
-  // Define characteristic
-  positioningCharacteristic.setPermission(SECMODE_OPEN, SECMODE_NO_ACCESS);
-  positioningCharacteristic.setFixedLen(1);
-  positioningCharacteristic.begin();
 
     /* Start Advertising
    * - Enable auto advertising if disconnected
