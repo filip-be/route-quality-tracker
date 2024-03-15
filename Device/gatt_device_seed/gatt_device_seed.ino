@@ -4,14 +4,17 @@
 #define BUTTON_PRESS_DELAY          100
 #define BLE_APPERANCE_GATT_SERVICE  0x1801
 
+#define PIN_VBAT        (32)  // D32 battery voltage
+#define PIN_VBAT_ENABLE (14)  // D14 LOW:read anable
+#define PIN_HICHG       (22)  // D22 charge current setting LOW:100mA HIGH:50mA
+#define PIN_CHG         (23)  // D23 charge indicatore LOW:charge HIGH:no charge
+
 const uint8_t LEDS_ARRAY[3] = { LED_RED, LED_BLUE, LED_GREEN };
 
 BLEDis bledis;
 // BLEService bleService(BLEUuid(BLE_APPERANCE_GATT_SERVICE));
 BLECharacteristic positioningCharacteristic(BLEUuid(0x2A69), CharsProperties::CHR_PROPS_NOTIFY | CharsProperties::CHR_PROPS_READ);
 BLEBas batteryService;
-
-uint8_t batteryLevel = 100;
 
 void lightLed(int ledPin) {
   for(int i = 0; i < 3; i++) {
@@ -64,15 +67,18 @@ void setStatusAndWaitForButtonPress(const uint8_t ledPin) {
   }
 
   lightLed(ledPin);
-  char batteryLevelMessage[50];
-  sprintf(batteryLevelMessage, "Setting battery level status to: %u", batteryLevel);
-  serialPrint(batteryLevelMessage);
-  batteryService.write(batteryLevel);
-  batteryService.notify(batteryLevel);
 
-  batteryLevel--;
-  // serialPrint("Checking current characteristic value");
-  // ble.sendCommandCheckOK("AT+GATTCHAR=1");
+  int vbatt = analogRead(PIN_VBAT);
+  float batterLevelFloat = 2.961 * 3.6 * vbatt / 4096;
+
+  char batteryLevelMessage[100];
+  sprintf(batteryLevelMessage, 
+    "Setting battery level status to: %.2f. Charging status %d (0: charging, 1: discharging)",
+    batterLevelFloat, digitalRead(PIN_CHG));
+  serialPrint(batteryLevelMessage);
+  batteryService.write((int) batterLevelFloat);
+  batteryService.notify((int) batterLevelFloat);
+
   waitForButtonPress();
 }
 
@@ -90,6 +96,19 @@ void setup() {
   pinMode(LED_GREEN, OUTPUT);
 
   pinMode(BUTTON_USER, INPUT_PULLUP);
+
+  // Battery pins
+  pinMode(PIN_VBAT, INPUT);
+  pinMode(PIN_VBAT_ENABLE, OUTPUT);
+  pinMode(PIN_HICHG, OUTPUT);
+  pinMode(PIN_CHG, INPUT);
+
+  digitalWrite(PIN_VBAT_ENABLE, LOW); // VBAT read enable
+  digitalWrite(PIN_HICHG, LOW);       // charge current 100mA
+  
+  // initialise ADC wireing_analog_nRF52.c:73
+  analogReference(AR_DEFAULT);        // default 0.6V*6=3.6V  wireing_analog_nRF52.c:73
+  analogReadResolution(12);           // wireing_analog_nRF52.c:39
 
   // stop LED
   lightLed(-1);
@@ -131,6 +150,7 @@ void startAdvertising()
   
   // Include General GATT Service
   // Bluefruit.Advertising.addService(bleService);
+  Bluefruit.Advertising.addService(bledis);
   Bluefruit.Advertising.addService(batteryService);
   
   // There is enough room for the dev name in the advertising packet
