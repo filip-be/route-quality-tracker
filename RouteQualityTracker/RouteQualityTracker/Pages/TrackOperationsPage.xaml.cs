@@ -1,4 +1,3 @@
-using System.IO;
 using System.Text.Json;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;
@@ -6,22 +5,29 @@ using RouteQualityTracker.Core.Gpx;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
+using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker.Pages;
 
 public partial class TrackOperationsPage : ContentPage
 {
     private readonly ITrackAnalyzer _trackAnalyzer;
+    private readonly ISettingsService _settingsService;
+    private readonly IActivitiesIntegrationService _activitiesIntegrationService;
+
+    private const string StravaClientId = "123539";
 
     private IList<RouteQualityRecord>? _routeQualityRecords;
     private FileResult? _gpxFile;
     private GpxData? _gpxData;
-    private SemaphoreSlim _updateProgressBarSemaphore = new (1, 1);
+    private readonly SemaphoreSlim _updateProgressBarSemaphore = new (1, 1);
 
     public TrackOperationsPage()
     {
         InitializeComponent();
         _trackAnalyzer = ServiceHelper.GetService<ITrackAnalyzer>();
+        _settingsService = ServiceHelper.GetService<ISettingsService>();
+        _activitiesIntegrationService = ServiceHelper.GetService<IActivitiesIntegrationService>();
     }
 
     private async void OnLoadRouteQuality(object sender, EventArgs e)
@@ -51,19 +57,41 @@ public partial class TrackOperationsPage : ContentPage
 
             _routeQualityRecords = JsonSerializer.Deserialize<IList<RouteQualityRecord>>(stream)!;
 
-            logEditor.Text = $"Loaded {_routeQualityRecords.Count} records from {file.FileName}";
+            LogEditor.Text = $"Loaded {_routeQualityRecords.Count} records from {file.FileName}";
 
-            loadGpxBtn.IsEnabled = true;
-            loadRouteQualityBtn.IsEnabled = false;
+            LoadGpxBtn.IsEnabled = true;
+            LoadRouteQualityBtn.IsEnabled = false;
         }
         catch (Exception ex)
         {
             await Toast.Make($"Error loading file: {ex.Message}").Show();
-            logEditor.Text += $"{Environment.NewLine}Error: {ex}";
+            LogEditor.Text += $"{Environment.NewLine}Error: {ex}";
         }
     }
 
     private async void OnLoadGpx(object sender, EventArgs e)
+    {
+        if (_settingsService.Settings.ImportDataFromFile)
+        {
+            await LoadGpxFile();
+            return;
+        }
+
+        if (_settingsService.Settings.ImportFromStrava)
+        {
+            LoadGpxFromStrava();
+            return;
+        }
+
+        await Toast.Make("Data import settings are not defined.").Show();
+    }
+
+    private void LoadGpxFromStrava()
+    {
+        _activitiesIntegrationService.AuthenticateViaStrava(StravaClientId);
+    }
+
+    private async Task LoadGpxFile()
     {
         try
         {
@@ -95,55 +123,56 @@ public partial class TrackOperationsPage : ContentPage
 
             _gpxFile = file;
             
-            logEditor.Text += $"{Environment.NewLine}Loaded gpx file {file.FileName}";
+            LogEditor.Text += $"{Environment.NewLine}Loaded gpx file {file.FileName}";
 
-            processFilesBtn.IsEnabled = true;
-            loadGpxBtn.IsEnabled = false;
+            ProcessFilesBtn.IsEnabled = true;
+            LoadGpxBtn.IsEnabled = false;
         }
         catch (Exception ex)
         {
             await Toast.Make($"Error loading file: {ex.Message}").Show();
-            logEditor.Text += $"{Environment.NewLine}Error: {ex}";
+            LogEditor.Text += $"{Environment.NewLine}Error: {ex}";
         }
     }
+
     private async void OnProcessFiles(object sender, EventArgs e)
     {
         try
         {
             await using var fileStream = await _gpxFile!.OpenReadAsync();
 
-            logEditor.Text += $"{Environment.NewLine}Processing track data...";
-            saveTrackBtn.IsEnabled = false;
-            resetBtn.IsEnabled = false;
+            LogEditor.Text += $"{Environment.NewLine}Processing track data...";
+            SaveTrackBtn.IsEnabled = false;
+            ResetBtn.IsEnabled = false;
 
-            logEditor.IsVisible = false;
-            progressBar.Progress = 0;
-            progressBar.IsVisible = true;
-            processingLabel.IsVisible = true;
-            processFilesBtn.IsEnabled = false;
+            LogEditor.IsVisible = false;
+            ProgressBar.Progress = 0;
+            ProgressBar.IsVisible = true;
+            ProcessingLabel.IsVisible = true;
+            ProcessFilesBtn.IsEnabled = false;
 
             _gpxData = await _trackAnalyzer.MarkupTrack(fileStream, _routeQualityRecords!, UpdateProgressAction);
 
-            progressBar.IsVisible = false;
-            processingLabel.IsVisible = false;
-            logEditor.IsVisible = true;
-            logEditor.Text += $"{Environment.NewLine}Processed files. Found {_gpxData.Tracks.Count} track segments";
+            ProgressBar.IsVisible = false;
+            ProcessingLabel.IsVisible = false;
+            LogEditor.IsVisible = true;
+            LogEditor.Text += $"{Environment.NewLine}Processed files. Found {_gpxData.Tracks.Count} track segments";
 
-            saveTrackBtn.IsEnabled = true;
-            resetBtn.IsEnabled = true;
+            SaveTrackBtn.IsEnabled = true;
+            ResetBtn.IsEnabled = true;
         }
         catch (Exception ex)
         {
             await Toast.Make($"Error processing track: {ex.Message}").Show();
 
-            progressBar.IsVisible = false;
-            processingLabel.IsVisible = false;
-            logEditor.IsVisible = true;
-            logEditor.Text += $"{Environment.NewLine}Error: {ex}";
+            ProgressBar.IsVisible = false;
+            ProcessingLabel.IsVisible = false;
+            LogEditor.IsVisible = true;
+            LogEditor.Text += $"{Environment.NewLine}Error: {ex}";
 
-            processFilesBtn.IsEnabled = true;
-            saveTrackBtn.IsEnabled = true;
-            resetBtn.IsEnabled = true;
+            ProcessFilesBtn.IsEnabled = true;
+            SaveTrackBtn.IsEnabled = true;
+            ResetBtn.IsEnabled = true;
         }
     }
 
@@ -152,7 +181,7 @@ public partial class TrackOperationsPage : ContentPage
         try
         {
             await _updateProgressBarSemaphore.WaitAsync();
-            await progressBar.ProgressTo(currentProgress, 100, Easing.Linear);
+            await ProgressBar.ProgressTo(currentProgress, 100, Easing.Linear);
         }
         finally
         {
@@ -174,30 +203,30 @@ public partial class TrackOperationsPage : ContentPage
             if (fileSaverResult.IsSuccessful)
             {
                 await Toast.Make("Successfully save track with route quality").Show();
-                logEditor.Text +=
+                LogEditor.Text +=
                     $"{Environment.NewLine}The file was saved successfully to location: {fileSaverResult.FilePath}";
             }
             else
             {
                 await Toast.Make($"Error saving file: {fileSaverResult.Exception.Message}").Show();
-                logEditor.Text += $"{Environment.NewLine}Error: {fileSaverResult.Exception}";
+                LogEditor.Text += $"{Environment.NewLine}Error: {fileSaverResult.Exception}";
             }
         }
         catch (Exception ex)
         {
             await Toast.Make($"Error saving file: {ex.Message}").Show();
-            logEditor.Text += $"{Environment.NewLine}Error: {ex}";
+            LogEditor.Text += $"{Environment.NewLine}Error: {ex}";
         }
     }
 
     private void OnReset(object sender, EventArgs e)
     {
-        logEditor.Text = String.Empty;
+        LogEditor.Text = String.Empty;
 
-        loadRouteQualityBtn.IsEnabled = true;
-        loadGpxBtn.IsEnabled = false;
-        processFilesBtn.IsEnabled = false;
-        saveTrackBtn.IsEnabled = false;
+        LoadRouteQualityBtn.IsEnabled = true;
+        LoadGpxBtn.IsEnabled = false;
+        ProcessFilesBtn.IsEnabled = false;
+        SaveTrackBtn.IsEnabled = false;
 
         _routeQualityRecords = null;
         _gpxData = null;

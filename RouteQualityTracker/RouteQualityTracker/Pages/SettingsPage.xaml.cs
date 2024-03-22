@@ -23,17 +23,18 @@ public partial class SettingsPage : ContentPage
 
     protected override void OnAppearing()
     {
-        inputOptionsGrid.IsEnabled = !_serviceManager.IsRunning;
+        InputOptionsGrid.IsEnabled = !_serviceManager.IsRunning;
+        InputDeviceToggleDisabledLabel.IsVisible = _serviceManager.IsRunning;
 
-        if (!useHeadset.IsEnabled)
+        if (!UseHeadset.IsEnabled)
         {
             LoadSettings();
 
-            useHeadset.IsEnabled = true;
-            useMediaControls.IsEnabled = true;
-            useCustomDevice.IsEnabled = true;
-            sendSmsSwitch.IsEnabled = true;
-            sendEmailsSwitch.IsEnabled = true;
+            UseHeadset.IsEnabled = true;
+            UseMediaControls.IsEnabled = true;
+            UseCustomDevice.IsEnabled = true;
+            SendSmsSwitch.IsEnabled = true;
+            SendEmailsSwitch.IsEnabled = true;
         }
         base.OnAppearing();
     }
@@ -47,35 +48,39 @@ public partial class SettingsPage : ContentPage
 
     private void LoadSettings()
     {
-        useHeadset.IsToggled = _settingsService.Settings.UseHeadset;
-        useMediaControls.IsToggled = _settingsService.Settings.UseMediaControls;
-        useCustomDevice.IsToggled = _settingsService.Settings.UseCustomDevice;
-        sendSmsSwitch.IsToggled = _settingsService.Settings.SendSms;
-        smsNumber.Text = _settingsService.Settings.SmsNumber;
-        sendEmailsSwitch.IsToggled = _settingsService.Settings.SendEmail;
-        toEntry.Text = _settingsService.Settings.MailTo;
-        usernameEntry.Text = _settingsService.Settings.Username;
-        passwordEntry.Text = _settingsService.Settings.Password;
-        smtpServerEntry.Text = _settingsService.Settings.SmtpServer;
-        smtpPortEntry.Text = _settingsService.Settings.SmtpPort.ToString();
+        UseHeadset.IsToggled = _settingsService.Settings.UseHeadset;
+        UseMediaControls.IsToggled = _settingsService.Settings.UseMediaControls;
+        UseCustomDevice.IsToggled = _settingsService.Settings.UseCustomDevice;
+        ImportDataFromFile.IsToggled = _settingsService.Settings.ImportDataFromFile;
+        ImportFromStrava.IsToggled = _settingsService.Settings.ImportFromStrava;
+        SendSmsSwitch.IsToggled = _settingsService.Settings.SendSms;
+        SmsNumber.Text = _settingsService.Settings.SmsNumber;
+        SendEmailsSwitch.IsToggled = _settingsService.Settings.SendEmail;
+        ToEntry.Text = _settingsService.Settings.MailTo;
+        UsernameEntry.Text = _settingsService.Settings.Username;
+        PasswordEntry.Text = _settingsService.Settings.Password;
+        SmtpServerEntry.Text = _settingsService.Settings.SmtpServer;
+        SmtpPortEntry.Text = _settingsService.Settings.SmtpPort.ToString();
     }
 
     private async void OnSaveSettings(object sender, EventArgs e)
     {
-        _ = int.TryParse(smtpPortEntry.Text, out int smtpPort);
+        _ = int.TryParse(SmtpPortEntry.Text, out int smtpPort);
 
         var newSettings = new AppSettings
         {
-            UseHeadset = useHeadset.IsToggled,
-            UseMediaControls = useMediaControls.IsToggled,
-            UseCustomDevice = useCustomDevice.IsToggled,
-            SendSms = sendSmsSwitch.IsToggled,
-            SmsNumber = smsNumber.Text,
-            SendEmail = sendEmailsSwitch.IsToggled,
-            MailTo = toEntry.Text,
-            Username = usernameEntry.Text,
-            Password = passwordEntry.Text,
-            SmtpServer = smtpServerEntry.Text,
+            UseHeadset = UseHeadset.IsToggled,
+            UseMediaControls = UseMediaControls.IsToggled,
+            UseCustomDevice = UseCustomDevice.IsToggled,
+            ImportDataFromFile = ImportDataFromFile.IsToggled,
+            ImportFromStrava = ImportFromStrava.IsToggled,
+            SendSms = SendSmsSwitch.IsToggled,
+            SmsNumber = SmsNumber.Text,
+            SendEmail = SendEmailsSwitch.IsToggled,
+            MailTo = ToEntry.Text,
+            Username = UsernameEntry.Text,
+            Password = PasswordEntry.Text,
+            SmtpServer = SmtpServerEntry.Text,
             SmtpPort = smtpPort
         };
 
@@ -86,22 +91,43 @@ public partial class SettingsPage : ContentPage
 
     private void NotificationsExpandedChanged(object sender, CommunityToolkit.Maui.Core.ExpandedChangedEventArgs e)
     {
-        notificationExpanderIcon.Source = e.IsExpanded ? ImageSource.FromFile(ChevronUpIcon) : ImageSource.FromFile(ChevronDownIcon);
-        notificationDivider.IsVisible = e.IsExpanded;
+        NotificationExpanderIcon.Source = e.IsExpanded ? ImageSource.FromFile(ChevronUpIcon) : ImageSource.FromFile(ChevronDownIcon);
+        NotificationDivider.IsVisible = e.IsExpanded;
     }
 
     private void InputExpandedChanged(object sender, CommunityToolkit.Maui.Core.ExpandedChangedEventArgs e)
     {
-        inputExpanderIcon.Source = e.IsExpanded ? ImageSource.FromFile(ChevronUpIcon) : ImageSource.FromFile(ChevronDownIcon);
-        inputDivider.IsVisible = e.IsExpanded;
+        InputExpanderIcon.Source = e.IsExpanded ? ImageSource.FromFile(ChevronUpIcon) : ImageSource.FromFile(ChevronDownIcon);
+        InputDivider.IsVisible = e.IsExpanded;
     }
-    
+
+    private void ImportDataExpandedChanged(object sender, CommunityToolkit.Maui.Core.ExpandedChangedEventArgs e)
+    {
+        ImportDataExpanderIcon.Source = e.IsExpanded ? ImageSource.FromFile(ChevronUpIcon) : ImageSource.FromFile(ChevronDownIcon);
+        ImportDataDivider.IsVisible = e.IsExpanded;
+    }
+
+    private void OnImportDataFileToggled(object sender, ToggledEventArgs e)
+    {
+        if (e.Value)
+        {
+            ImportFromStrava.IsToggled = false;
+        }
+    }
+    private void OnImportFromStravaToggled(object sender, ToggledEventArgs e)
+    {
+        if (e.Value)
+        {
+            ImportDataFromFile.IsToggled = false;
+        }
+    }
+
     private void OnUseHeadsetToggled(object sender, ToggledEventArgs e)
     {
         if (e.Value)
         {
-            useMediaControls.IsToggled = false;
-            useCustomDevice.IsToggled = false;
+            UseMediaControls.IsToggled = false;
+            UseCustomDevice.IsToggled = false;
         }
     }
 
@@ -109,8 +135,8 @@ public partial class SettingsPage : ContentPage
     {
         if (e.Value)
         {
-            useHeadset.IsToggled = false;
-            useCustomDevice.IsToggled = false;
+            UseHeadset.IsToggled = false;
+            UseCustomDevice.IsToggled = false;
         }
     }
 
@@ -118,8 +144,8 @@ public partial class SettingsPage : ContentPage
     {
         if (e.Value)
         {
-            useMediaControls.IsToggled = false;
-            useHeadset.IsToggled = false;
+            UseMediaControls.IsToggled = false;
+            UseHeadset.IsToggled = false;
         }
     }
 }

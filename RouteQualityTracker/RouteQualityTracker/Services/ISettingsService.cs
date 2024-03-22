@@ -15,6 +15,8 @@ public interface ISettingsService
     const string UseHeadsetProp = "UseHeadset";
     const string UseMediaControlsProp = "UseMediaControls";
     const string UseCustomDeviceProp = "UseCustomDevice";
+    const string ImportDataFromFileProp = "ImportDataFromFile";
+    const string ImportFromStravaProp = "ImportFromStrava";
 
     AppSettings Settings { get; }
 

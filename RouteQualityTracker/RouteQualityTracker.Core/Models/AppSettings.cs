@@ -23,4 +23,8 @@ public class AppSettings
     public bool UseMediaControls { get; set; }
 
     public bool UseCustomDevice { get; set; }
+
+    public bool ImportDataFromFile { get; set; }
+
+    public bool ImportFromStrava { get; set; }
 }

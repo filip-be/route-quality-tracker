@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RouteQualityTracker.Pages.SettingsPage"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             x:Name="self">
+             x:Name="Self">
     <ScrollView>
         <VerticalStackLayout Padding="30" Spacing="10">
-            <Button x:Name="loadSettingsBtn"
+            <Button x:Name="LoadSettingsBtn"
                     IsEnabled="True"
                     Text="Reload settings"
                     BackgroundColor="{StaticResource PrimaryDark}"
@@ -34,7 +34,7 @@
                                 Grid.Column="0"/>
 
                             <Image
-                                x:Name="inputExpanderIcon"
+                                x:Name="InputExpanderIcon"
                                 Source="chevron_down.png"
                                 Aspect="AspectFit"
                                 SemanticProperties.Description="expand/collapse"
@@ -42,20 +42,20 @@
                         </Grid>
 
                         <BoxView 
-                            x:Name="inputDivider"
+                            x:Name="InputDivider"
                             IsVisible="false"
                             Margin="0, 10"
                             HeightRequest="1" 
                             Color="LightGray"/>
 
-                        <Label x:Name="inputDeviceToggleDisabledLabel"
+                        <Label x:Name="InputDeviceToggleDisabledLabel"
                                IsVisible="False"
                                FontAttributes="Bold"
                                Text="Service must be stopped to modify input settings" />
                     </VerticalStackLayout>
                 </toolkit:Expander.Header>
                 <VerticalStackLayout Padding="10" Spacing="5">
-                    <Grid x:Name="inputOptionsGrid">
+                    <Grid x:Name="InputOptionsGrid">
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
@@ -65,17 +65,18 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="50"/>
                         </Grid.ColumnDefinitions>
-                        
+
                         <Label Text="Use headset" VerticalOptions="Center" Grid.Column="0"/>
-                        <Switch x:Name="useHeadset"
+                        <Switch x:Name="UseHeadset"
                                 Toggled="OnUseHeadsetToggled"
                                 IsEnabled="False"
                                 IsToggled="False"
-                                Grid.Column="1"/>
+                                Grid.Column="1"
+                                Grid.Row="0" />
 
 
                         <Label Text="Use media controls" VerticalOptions="Center" Grid.Column="0" Grid.Row="1"/>
-                        <Switch x:Name="useMediaControls"
+                        <Switch x:Name="UseMediaControls"
                                 Toggled="OnUseMediaControlsToggled"
                                 IsEnabled="False"
                                 IsToggled="False"
@@ -84,7 +85,7 @@
 
 
                         <Label Text="Use position status device" VerticalOptions="Center" Grid.Column="0" Grid.Row="2"/>
-                        <Switch x:Name="useCustomDevice"
+                        <Switch x:Name="UseCustomDevice"
                                 Toggled="OnUseCustomDeviceToggled"
                                 IsEnabled="False"
                                 IsToggled="False"
@@ -93,7 +94,69 @@
                     </Grid>
                 </VerticalStackLayout>
             </toolkit:Expander>
-            
+
+            <BoxView HeightRequest="1" Color="LightGray" />
+
+            <toolkit:Expander ExpandedChanged="ImportDataExpandedChanged">
+                <toolkit:Expander.Header>
+                    <VerticalStackLayout>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+                            <Label 
+                                Text="Data import" 
+                                FontSize="Medium"
+                                VerticalOptions="Center" 
+                                Grid.Column="0"/>
+
+                            <Image
+                                x:Name="ImportDataExpanderIcon"
+                                Source="chevron_down.png"
+                                Aspect="AspectFit"
+                                SemanticProperties.Description="expand/collapse"
+                                Grid.Column="1"/>
+                        </Grid>
+
+                        <BoxView 
+                            x:Name="ImportDataDivider"
+                            IsVisible="false"
+                            Margin="0, 10"
+                            HeightRequest="1" 
+                            Color="LightGray"/>
+                    </VerticalStackLayout>
+                </toolkit:Expander.Header>
+
+                <VerticalStackLayout Padding="10" Spacing="5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="50"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Label Text="Import GPX file" VerticalOptions="Center" Grid.Column="0"/>
+                        <Switch x:Name="ImportDataFromFile"
+                            Toggled="OnImportDataFileToggled"
+                            IsToggled="False"
+                            Grid.Column="1"
+                            Grid.Row="0" />
+
+
+                        <Label Text="Import from Strava" VerticalOptions="Center" Grid.Column="0" Grid.Row="1"/>
+                        <Switch x:Name="ImportFromStrava"
+                            Toggled="OnImportFromStravaToggled"
+                            IsToggled="False"
+                            Grid.Column="1"
+                            Grid.Row="1"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </toolkit:Expander>
+
             <BoxView HeightRequest="1" Color="LightGray" />
 
             <toolkit:Expander ExpandedChanged="NotificationsExpandedChanged">
@@ -111,7 +174,7 @@
                                 Grid.Column="0"/>
 
                             <Image
-                                x:Name="notificationExpanderIcon"
+                                x:Name="NotificationExpanderIcon"
                                 Source="chevron_down.png"
                                 Aspect="AspectFit"
                                 SemanticProperties.Description="expand/collapse"
@@ -119,7 +182,7 @@
                         </Grid>
 
                         <BoxView 
-                            x:Name="notificationDivider"
+                            x:Name="NotificationDivider"
                             IsVisible="false"
                             Margin="0, 10"
                             HeightRequest="1" 
@@ -134,7 +197,7 @@
                             <ColumnDefinition Width="50"/>
                         </Grid.ColumnDefinitions>
                         <Label Text="Send SMS notifications" VerticalOptions="Center" Grid.Column="0"/>
-                        <Switch x:Name="sendSmsSwitch"
+                        <Switch x:Name="SendSmsSwitch"
                                 IsEnabled="False"
                                 IsToggled="False"
                                 Grid.Column="1"/>
@@ -142,9 +205,9 @@
 
                     <Label Text="To (SMS)" />
                     <Entry 
-                        x:Name="smsNumber"
+                        x:Name="SmsNumber"
                         Keyboard="Telephone"
-                        IsEnabled="{Binding Source={x:Reference sendSmsSwitch}, Path=IsToggled}" />
+                        IsEnabled="{Binding Source={x:Reference SendSmsSwitch}, Path=IsToggled}" />
 
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -152,7 +215,7 @@
                             <ColumnDefinition Width="50"/>
                         </Grid.ColumnDefinitions>
                         <Label Text="Send email notifications" VerticalOptions="Center" Grid.Column="0"/>
-                        <Switch x:Name="sendEmailsSwitch"
+                        <Switch x:Name="SendEmailsSwitch"
                                 IsEnabled="False"
                                 IsToggled="False"
                                 Grid.Column="1"/>
@@ -162,31 +225,31 @@
 
                     <Label Text="To (Email)" />
                     <Entry 
-                        x:Name="toEntry"
+                        x:Name="ToEntry"
                         Keyboard="Email"
-                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+                        IsEnabled="{Binding Source={x:Reference SendEmailsSwitch}, Path=IsToggled}" />
 
                     <Label Text="Username" />
                     <Entry 
-                        x:Name="usernameEntry"
-                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+                        x:Name="UsernameEntry"
+                        IsEnabled="{Binding Source={x:Reference SendEmailsSwitch}, Path=IsToggled}" />
 
                     <Label Text="Password" />
                     <Entry 
-                        x:Name="passwordEntry"
+                        x:Name="PasswordEntry"
                         IsPassword="True"
-                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+                        IsEnabled="{Binding Source={x:Reference SendEmailsSwitch}, Path=IsToggled}" />
 
                     <Label Text="SMTP server" />
                     <Entry 
-                        x:Name="smtpServerEntry"
-                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+                        x:Name="SmtpServerEntry"
+                        IsEnabled="{Binding Source={x:Reference SendEmailsSwitch}, Path=IsToggled}" />
 
                     <Label Text="SMTP port" />
                     <Entry 
-                        x:Name="smtpPortEntry"
+                        x:Name="SmtpPortEntry"
                         Keyboard="Numeric"
-                        IsEnabled="{Binding Source={x:Reference sendEmailsSwitch}, Path=IsToggled}" />
+                        IsEnabled="{Binding Source={x:Reference SendEmailsSwitch}, Path=IsToggled}" />
                 </VerticalStackLayout>
             </toolkit:Expander>
         </VerticalStackLayout>
