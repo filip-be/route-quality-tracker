@@ -13,12 +13,46 @@ public partial class SettingsPage : ContentPage
 
     private readonly ISettingsService _settingsService;
     private readonly IServiceManager _serviceManager;
+    private readonly IActivitiesIntegrationService _activitiesIntegrationService;
 
     public SettingsPage()
     {
         InitializeComponent();
         _settingsService = ServiceHelper.GetService<ISettingsService>();
         _serviceManager = ServiceHelper.Services.GetService<IServiceManager>()!;
+        _activitiesIntegrationService = ServiceHelper.GetService<IActivitiesIntegrationService>();
+        _activitiesIntegrationService.OnStravaAuthenticationCompleted += OnStravaAuthenticationCompletedAsync;
+    }
+
+    private async Task OnStravaAuthenticationCompletedAsync(object? sender, EventArgs eventArgs)
+    {
+        if (string.IsNullOrEmpty(_settingsService.Settings.StravaApiCode))
+        {
+            await Toast.Make("Strava authentication has failed").Show();
+            return;
+        }
+
+        _ = int.TryParse(SmtpPortEntry.Text, out int smtpPort);
+
+        var newSettings = new AppSettings
+        {
+            UseHeadset = UseHeadset.IsToggled,
+            UseMediaControls = UseMediaControls.IsToggled,
+            UseCustomDevice = UseCustomDevice.IsToggled,
+            ImportDataFromFile = ImportDataFromFile.IsToggled,
+            ImportFromStrava = ImportFromStrava.IsToggled,
+            SendSms = SendSmsSwitch.IsToggled,
+            SmsNumber = SmsNumber.Text,
+            SendEmail = SendEmailsSwitch.IsToggled,
+            MailTo = ToEntry.Text,
+            Username = UsernameEntry.Text,
+            Password = PasswordEntry.Text,
+            SmtpServer = SmtpServerEntry.Text,
+            SmtpPort = smtpPort
+        };
+
+        _settingsService.UpdateSettings(newSettings);
+        await Toast.Make("Settings saved successfully").Show();
     }
 
     protected override void OnAppearing()
@@ -63,9 +97,9 @@ public partial class SettingsPage : ContentPage
         SmtpPortEntry.Text = _settingsService.Settings.SmtpPort.ToString();
     }
 
-    private async void OnSaveSettings(object sender, EventArgs e)
+    private void UpdateSettings()
     {
-        _ = int.TryParse(SmtpPortEntry.Text, out int smtpPort);
+        _ = int.TryParse(SmtpPortEntry.Text, out var smtpPort);
 
         var newSettings = new AppSettings
         {
@@ -85,8 +119,18 @@ public partial class SettingsPage : ContentPage
         };
 
         _settingsService.UpdateSettings(newSettings);
+    }
 
-        await Toast.Make("Settings saved").Show();
+    private async void OnSaveSettings(object sender, EventArgs e)
+    {
+        if (!ImportFromStrava.IsToggled)
+        {
+            UpdateSettings();
+            await Toast.Make("Settings saved").Show();
+            
+        }
+
+        _activitiesIntegrationService.AuthenticateViaStrava(AppSettings.StravaClientId);
     }
 
     private void NotificationsExpandedChanged(object sender, CommunityToolkit.Maui.Core.ExpandedChangedEventArgs e)

@@ -27,4 +27,8 @@ public class AppSettings
     public bool ImportDataFromFile { get; set; }
 
     public bool ImportFromStrava { get; set; }
+
+    public string StravaApiCode { get; set; }
+
+    public const string StravaClientId = "123539";
 }

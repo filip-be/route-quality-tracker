@@ -17,8 +17,11 @@ public interface ISettingsService
     const string UseCustomDeviceProp = "UseCustomDevice";
     const string ImportDataFromFileProp = "ImportDataFromFile";
     const string ImportFromStravaProp = "ImportFromStrava";
+    const string StravaApiCodeProp = "StravaApiCode";
 
     AppSettings Settings { get; }
 
     void UpdateSettings(AppSettings newSettings);
+
+    void UpdateStravaApiCode(string? stravaApiCode);
 }

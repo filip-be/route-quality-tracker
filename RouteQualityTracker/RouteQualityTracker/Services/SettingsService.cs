@@ -2,9 +2,8 @@
 
 namespace RouteQualityTracker.Services;
 
-public class SettingsService : ISettingsService
+public class SettingsService(AppSettings settings) : ISettingsService
 {
-    private readonly AppSettings _settings;
     private bool _initialized;
 
     public AppSettings Settings
@@ -17,13 +16,8 @@ public class SettingsService : ISettingsService
                 _initialized = true;
             }
 
-            return _settings;
+            return settings;
         }
-    }
-
-    public SettingsService(AppSettings settings)
-    {
-        _settings = settings;
     }
 
     public void UpdateSettings(AppSettings newSettings)
@@ -42,35 +36,42 @@ public class SettingsService : ISettingsService
         Preferences.Default.Set(ISettingsService.SendToSmtpServerProp, newSettings.SmtpServer);
         Preferences.Default.Set(ISettingsService.SentToSmtpPortProp, newSettings.SmtpPort);
 
-        _settings.UseHeadset = newSettings.UseHeadset;
-        _settings.UseMediaControls = newSettings.UseMediaControls;
-        _settings.UseCustomDevice = newSettings.UseCustomDevice;
-        _settings.ImportDataFromFile = newSettings.ImportDataFromFile;
-        _settings.ImportFromStrava = newSettings.ImportFromStrava;
-        _settings.SendSms = newSettings.SendSms;
-        _settings.SmsNumber = newSettings.SmsNumber;
-        _settings.SendEmail = newSettings.SendEmail;
-        _settings.MailTo = newSettings.MailTo;
-        _settings.Username = newSettings.Username;
-        _settings.Password = newSettings.Password;
-        _settings.SmtpServer = newSettings.SmtpServer;
-        _settings.SmtpPort = newSettings.SmtpPort;
+        settings.UseHeadset = newSettings.UseHeadset;
+        settings.UseMediaControls = newSettings.UseMediaControls;
+        settings.UseCustomDevice = newSettings.UseCustomDevice;
+        settings.ImportDataFromFile = newSettings.ImportDataFromFile;
+        settings.ImportFromStrava = newSettings.ImportFromStrava;
+        settings.SendSms = newSettings.SendSms;
+        settings.SmsNumber = newSettings.SmsNumber;
+        settings.SendEmail = newSettings.SendEmail;
+        settings.MailTo = newSettings.MailTo;
+        settings.Username = newSettings.Username;
+        settings.Password = newSettings.Password;
+        settings.SmtpServer = newSettings.SmtpServer;
+        settings.SmtpPort = newSettings.SmtpPort;
+    }
+
+    public void UpdateStravaApiCode(string? stravaApiCode)
+    {
+        Preferences.Default.Set(ISettingsService.StravaApiCodeProp, stravaApiCode ?? string.Empty);
+        settings.StravaApiCode = stravaApiCode ?? string.Empty;
     }
 
     private void InitializeSettings()
     {
-        _settings.UseHeadset = Preferences.Default.Get(ISettingsService.UseHeadsetProp, false);
-        _settings.UseMediaControls = Preferences.Default.Get(ISettingsService.UseMediaControlsProp, false);
-        _settings.UseCustomDevice = Preferences.Default.Get(ISettingsService.UseCustomDeviceProp, false);
-        _settings.ImportDataFromFile = Preferences.Default.Get(ISettingsService.ImportDataFromFileProp, true);
-        _settings.ImportFromStrava = Preferences.Default.Get(ISettingsService.ImportFromStravaProp, false);
-        _settings.SendSms = Preferences.Default.Get(ISettingsService.SendSmsProp, false);
-        _settings.SmsNumber = Preferences.Default.Get(ISettingsService.SendSmsNumberProp, string.Empty);
-        _settings.SendEmail = Preferences.Default.Get(ISettingsService.SendEmailsProp, false);
-        _settings.MailTo = Preferences.Default.Get(ISettingsService.SendToEmailProp, string.Empty);
-        _settings.Username = Preferences.Default.Get(ISettingsService.SendFromEmailProp, string.Empty);
-        _settings.Password = Preferences.Default.Get(ISettingsService.SentToPasswordProp, string.Empty);
-        _settings.SmtpServer = Preferences.Default.Get(ISettingsService.SendToSmtpServerProp, string.Empty);
-        _settings.SmtpPort = Preferences.Default.Get(ISettingsService.SentToSmtpPortProp, 0);
+        settings.UseHeadset = Preferences.Default.Get(ISettingsService.UseHeadsetProp, false);
+        settings.UseMediaControls = Preferences.Default.Get(ISettingsService.UseMediaControlsProp, false);
+        settings.UseCustomDevice = Preferences.Default.Get(ISettingsService.UseCustomDeviceProp, false);
+        settings.ImportDataFromFile = Preferences.Default.Get(ISettingsService.ImportDataFromFileProp, true);
+        settings.ImportFromStrava = Preferences.Default.Get(ISettingsService.ImportFromStravaProp, false);
+        settings.StravaApiCode = Preferences.Default.Get(ISettingsService.StravaApiCodeProp, string.Empty);
+        settings.SendSms = Preferences.Default.Get(ISettingsService.SendSmsProp, false);
+        settings.SmsNumber = Preferences.Default.Get(ISettingsService.SendSmsNumberProp, string.Empty);
+        settings.SendEmail = Preferences.Default.Get(ISettingsService.SendEmailsProp, false);
+        settings.MailTo = Preferences.Default.Get(ISettingsService.SendToEmailProp, string.Empty);
+        settings.Username = Preferences.Default.Get(ISettingsService.SendFromEmailProp, string.Empty);
+        settings.Password = Preferences.Default.Get(ISettingsService.SentToPasswordProp, string.Empty);
+        settings.SmtpServer = Preferences.Default.Get(ISettingsService.SendToSmtpServerProp, string.Empty);
+        settings.SmtpPort = Preferences.Default.Get(ISettingsService.SentToSmtpPortProp, 0);
     }
 }

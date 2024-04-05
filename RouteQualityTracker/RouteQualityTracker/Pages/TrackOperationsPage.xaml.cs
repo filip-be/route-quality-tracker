@@ -13,9 +13,6 @@ public partial class TrackOperationsPage : ContentPage
 {
     private readonly ITrackAnalyzer _trackAnalyzer;
     private readonly ISettingsService _settingsService;
-    private readonly IActivitiesIntegrationService _activitiesIntegrationService;
-
-    private const string StravaClientId = "123539";
 
     private IList<RouteQualityRecord>? _routeQualityRecords;
     private FileResult? _gpxFile;
@@ -27,7 +24,6 @@ public partial class TrackOperationsPage : ContentPage
         InitializeComponent();
         _trackAnalyzer = ServiceHelper.GetService<ITrackAnalyzer>();
         _settingsService = ServiceHelper.GetService<ISettingsService>();
-        _activitiesIntegrationService = ServiceHelper.GetService<IActivitiesIntegrationService>();
     }
 
     private async void OnLoadRouteQuality(object sender, EventArgs e)
@@ -79,16 +75,16 @@ public partial class TrackOperationsPage : ContentPage
 
         if (_settingsService.Settings.ImportFromStrava)
         {
-            LoadGpxFromStrava();
+            await LoadGpxFromStrava();
             return;
         }
 
         await Toast.Make("Data import settings are not defined.").Show();
     }
 
-    private void LoadGpxFromStrava()
+    private static Task LoadGpxFromStrava()
     {
-        _activitiesIntegrationService.AuthenticateViaStrava(StravaClientId);
+        return Toast.Make("Not implemented yet").Show();
     }
 
     private async Task LoadGpxFile()
@@ -221,7 +217,7 @@ public partial class TrackOperationsPage : ContentPage
 
     private void OnReset(object sender, EventArgs e)
     {
-        LogEditor.Text = String.Empty;
+        LogEditor.Text = string.Empty;
 
         LoadRouteQualityBtn.IsEnabled = true;
         LoadGpxBtn.IsEnabled = false;
