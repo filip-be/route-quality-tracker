@@ -5,7 +5,6 @@ using Android.Content;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
-using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker.Platforms.Android;
 public class MediaSessionCallback : MediaSession.Callback
