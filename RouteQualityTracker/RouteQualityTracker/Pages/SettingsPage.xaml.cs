@@ -127,7 +127,7 @@ public partial class SettingsPage : ContentPage
         {
             UpdateSettings();
             await Toast.Make("Settings saved").Show();
-            
+            return;
         }
 
         _activitiesIntegrationService.AuthenticateViaStrava(AppSettings.StravaClientId);
