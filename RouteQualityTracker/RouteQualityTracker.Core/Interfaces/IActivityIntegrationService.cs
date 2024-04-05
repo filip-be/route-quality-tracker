@@ -2,7 +2,7 @@
 
 namespace RouteQualityTracker.Core.Interfaces;
 
-public interface IActivitiesIntegrationService
+public interface IActivityIntegrationService
 {
     void AuthenticateViaStrava(string clientId);
 
@@ -11,4 +11,6 @@ public interface IActivitiesIntegrationService
     void NotifyStravaAuthenticationHasCompleted();
 
     event AsyncEventHandler? OnStravaAuthenticationCompleted;
+
+    Task<bool> HasRequiredAccess();
 }

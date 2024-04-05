@@ -28,7 +28,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<AppSettings>();
         builder.Services.AddSingleton<ISettingsService, SettingsService>();
         builder.Services.AddSingleton<IServiceManager, ServiceManager>();
-        builder.Services.AddSingleton<IActivitiesIntegrationService, ActivitiesIntegrationService>();
+        builder.Services.AddSingleton<IActivityIntegrationService, ActivityIntegrationService>();
         builder.Services.AddSingleton<IQualityTrackingService, QualityTrackingService>();
 
         builder.Services.AddScoped<INotificationService, NotificationService>();

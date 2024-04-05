@@ -1,6 +1,6 @@
 ﻿using RouteQualityTracker.Core.Models;
 
-namespace RouteQualityTracker.Services;
+namespace RouteQualityTracker.Core.Interfaces;
 
 public interface ISettingsService
 {

@@ -13,15 +13,15 @@ public partial class SettingsPage : ContentPage
 
     private readonly ISettingsService _settingsService;
     private readonly IServiceManager _serviceManager;
-    private readonly IActivitiesIntegrationService _activitiesIntegrationService;
+    private readonly IActivityIntegrationService _activityIntegrationService;
 
     public SettingsPage()
     {
         InitializeComponent();
         _settingsService = ServiceHelper.GetService<ISettingsService>();
         _serviceManager = ServiceHelper.Services.GetService<IServiceManager>()!;
-        _activitiesIntegrationService = ServiceHelper.GetService<IActivitiesIntegrationService>();
-        _activitiesIntegrationService.OnStravaAuthenticationCompleted += OnStravaAuthenticationCompletedAsync;
+        _activityIntegrationService = ServiceHelper.GetService<IActivityIntegrationService>();
+        _activityIntegrationService.OnStravaAuthenticationCompleted += OnStravaAuthenticationCompletedAsync;
     }
 
     private async Task OnStravaAuthenticationCompletedAsync(object? sender, EventArgs eventArgs)
@@ -123,14 +123,15 @@ public partial class SettingsPage : ContentPage
 
     private async void OnSaveSettings(object sender, EventArgs e)
     {
-        if (!ImportFromStrava.IsToggled)
+        if (ImportFromStrava.IsToggled 
+            && !await _activityIntegrationService.HasRequiredAccess())
         {
-            UpdateSettings();
-            await Toast.Make("Settings saved").Show();
+            _activityIntegrationService.AuthenticateViaStrava(AppSettings.StravaClientId);
             return;
         }
 
-        _activitiesIntegrationService.AuthenticateViaStrava(AppSettings.StravaClientId);
+        UpdateSettings();
+        await Toast.Make("Settings saved").Show();
     }
 
     private void NotificationsExpandedChanged(object sender, CommunityToolkit.Maui.Core.ExpandedChangedEventArgs e)

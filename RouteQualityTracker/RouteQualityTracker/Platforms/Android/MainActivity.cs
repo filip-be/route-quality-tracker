@@ -6,7 +6,6 @@ using RouteQualityTracker.Core.Extensions;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Services;
 using RouteQualityTracker.Platforms.Android;
-using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker;
 
@@ -18,7 +17,7 @@ public class MainActivity : MauiAppCompatActivity
     private readonly IServiceManager _serviceManager;
     private readonly ISettingsService _settingsService;
     private BluetoothGatt? _gattClient;
-    private readonly IActivitiesIntegrationService _activitiesIntegrationService;
+    private readonly IActivityIntegrationService _activityIntegrationService;
 
     private const string AppCallbackUri = "https://route-quality-tracker-app.com/StravaAuthorize";
 
@@ -28,8 +27,8 @@ public class MainActivity : MauiAppCompatActivity
         _settingsService = ServiceHelper.Services.GetService<ISettingsService>()!;
         _serviceManager.OnServiceStart += OnServiceStart;
         _serviceManager.OnServiceStop += OnServiceStop;
-        _activitiesIntegrationService = ServiceHelper.Services.GetService<IActivitiesIntegrationService>()!;
-        _activitiesIntegrationService.OnAuthenticateViaStrava += OnAuthenticateViaStrava;
+        _activityIntegrationService = ServiceHelper.Services.GetService<IActivityIntegrationService>()!;
+        _activityIntegrationService.OnAuthenticateViaStrava += OnAuthenticateViaStrava;
     }
 
     protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
@@ -39,7 +38,7 @@ public class MainActivity : MauiAppCompatActivity
         if (requestCode != StravaAuthorizeCallbackActivity.ActivityRequestCode) return;
 
         Console.WriteLine($"Activity completed: {requestCode}: {resultCode}");
-        _activitiesIntegrationService.NotifyStravaAuthenticationHasCompleted();
+        _activityIntegrationService.NotifyStravaAuthenticationHasCompleted();
     }
 
     private void OnAuthenticateViaStrava(object? sender, string clientId)

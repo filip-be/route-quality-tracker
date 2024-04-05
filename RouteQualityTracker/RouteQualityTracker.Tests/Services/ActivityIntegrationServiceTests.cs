@@ -6,14 +6,14 @@ using RouteQualityTracker.Core.Services;
 namespace RouteQualityTracker.Tests.Services;
 
 [TestFixture]
-public class ActivitiesIntegrationServiceTests
+public class ActivityIntegrationServiceTests
 {
-    private IActivitiesIntegrationService _service;
+    private IActivityIntegrationService _service;
 
     [SetUp]
     public void SetUp()
     {
-        _service = new ActivitiesIntegrationService();
+        _service = new ActivityIntegrationService();
     }
 
     [Test]

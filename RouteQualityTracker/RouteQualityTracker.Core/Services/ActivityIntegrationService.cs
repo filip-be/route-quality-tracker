@@ -3,8 +3,10 @@ using RouteQualityTracker.Core.Interfaces;
 
 namespace RouteQualityTracker.Core.Services;
 
-public class ActivitiesIntegrationService : IActivitiesIntegrationService
+public class ActivityIntegrationService(ISettingsService settingsService, IHttpClientFactory httpClientFactory) : IActivityIntegrationService
 {
+    public const string StravaHttpClient = "StravaClient";
+
     public void AuthenticateViaStrava(string clientId)
     {
         OnAuthenticateViaStrava?.Invoke(this, clientId);
@@ -18,4 +20,16 @@ public class ActivitiesIntegrationService : IActivitiesIntegrationService
     }
 
     public event AsyncEventHandler? OnStravaAuthenticationCompleted;
+
+    public Task<bool> HasRequiredAccess()
+    {
+        if (string.IsNullOrEmpty(settingsService.Settings.StravaApiCode))
+        {
+            return Task.FromResult(false);
+        }
+
+        _ = httpClientFactory.CreateClient(StravaHttpClient);
+
+        return Task.FromResult(false);
+    }
 }

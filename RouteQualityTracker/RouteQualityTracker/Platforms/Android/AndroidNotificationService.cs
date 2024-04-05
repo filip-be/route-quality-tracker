@@ -4,7 +4,6 @@ using Android.Telephony;
 using AndroidX.Core.App;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
-using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker.Platforms.Android;
 

@@ -1,4 +1,5 @@
-﻿using RouteQualityTracker.Core.Models;
+﻿using RouteQualityTracker.Core.Interfaces;
+using RouteQualityTracker.Core.Models;
 
 namespace RouteQualityTracker.Services;
 
