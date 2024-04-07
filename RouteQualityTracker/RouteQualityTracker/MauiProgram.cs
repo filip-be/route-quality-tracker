@@ -34,6 +34,8 @@ public static class MauiProgram
         builder.Services.AddScoped<INotificationService, NotificationService>();
         builder.Services.AddScoped<ITrackAnalyzer, TrackAnalyzer>();
 
+        builder.Services.AddHttpClient(ActivityIntegrationService.StravaHttpClient);
+
 #if ANDROID
         builder.Services.AddSingleton<MainActivity>();
         builder.Services.AddScoped<RouteQualityTracker.Platforms.Android.IAndroidNotificationService, 

@@ -13,4 +13,6 @@ public interface IActivityIntegrationService
     event AsyncEventHandler? OnStravaAuthenticationCompleted;
 
     Task<bool> HasRequiredAccess();
+    
+    Task AuthorizeToStrava(string? requestCode);
 }

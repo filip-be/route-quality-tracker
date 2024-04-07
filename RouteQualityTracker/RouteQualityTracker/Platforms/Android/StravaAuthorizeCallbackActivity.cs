@@ -1,9 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
-using Android.OS;
+using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Services;
-using RouteQualityTracker.Services;
-
 
 namespace RouteQualityTracker.Platforms.Android;
 
@@ -12,11 +10,13 @@ namespace RouteQualityTracker.Platforms.Android;
     DataScheme = "https", DataHost = "route-quality-tracker-app.com", DataPath = "/StravaAuthorize")]
 public class StravaAuthorizeCallbackActivity : Activity
 {
-    private readonly ISettingsService _settingsService = ServiceHelper.Services.GetService<ISettingsService>()!;
+    private readonly ISettingsService _settingsService = ServiceHelper.Services.GetRequiredService<ISettingsService>();
+    private readonly IActivityIntegrationService  _activityIntegrationService = 
+        ServiceHelper.Services.GetRequiredService<IActivityIntegrationService>();
 
     public const int ActivityRequestCode = 100;
 
-    protected override void OnResume()
+    protected override async void OnResume()
     {
         Console.WriteLine(@"StravaAuthorizeCallbackActivity started");
         base.OnResume();
@@ -28,7 +28,7 @@ public class StravaAuthorizeCallbackActivity : Activity
             var requestCode = Intent.Data.GetQueryParameter("code");
             Console.WriteLine("Request code received");
 
-            _settingsService.UpdateStravaApiCode(requestCode);
+            await _activityIntegrationService.AuthorizeToStrava(requestCode);
         }
         catch (Exception ex)
         {

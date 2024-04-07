@@ -32,27 +32,13 @@ public partial class SettingsPage : ContentPage
             return;
         }
 
-        _ = int.TryParse(SmtpPortEntry.Text, out int smtpPort);
-
-        var newSettings = new AppSettings
+        if (!await _activityIntegrationService.HasRequiredAccess())
         {
-            UseHeadset = UseHeadset.IsToggled,
-            UseMediaControls = UseMediaControls.IsToggled,
-            UseCustomDevice = UseCustomDevice.IsToggled,
-            ImportDataFromFile = ImportDataFromFile.IsToggled,
-            ImportFromStrava = ImportFromStrava.IsToggled,
-            SendSms = SendSmsSwitch.IsToggled,
-            SmsNumber = SmsNumber.Text,
-            SendEmail = SendEmailsSwitch.IsToggled,
-            MailTo = ToEntry.Text,
-            Username = UsernameEntry.Text,
-            Password = PasswordEntry.Text,
-            SmtpServer = SmtpServerEntry.Text,
-            SmtpPort = smtpPort
-        };
+            await Toast.Make("This is not implemented yet!").Show();
+            return;
+        }
 
-        _settingsService.UpdateSettings(newSettings);
-        await Toast.Make("Settings saved successfully").Show();
+        await UpdateSettings();
     }
 
     protected override void OnAppearing()
@@ -97,7 +83,7 @@ public partial class SettingsPage : ContentPage
         SmtpPortEntry.Text = _settingsService.Settings.SmtpPort.ToString();
     }
 
-    private void UpdateSettings()
+    private async Task UpdateSettings()
     {
         _ = int.TryParse(SmtpPortEntry.Text, out var smtpPort);
 
@@ -119,6 +105,7 @@ public partial class SettingsPage : ContentPage
         };
 
         _settingsService.UpdateSettings(newSettings);
+        await Toast.Make("Settings saved").Show();
     }
 
     private async void OnSaveSettings(object sender, EventArgs e)
@@ -130,8 +117,7 @@ public partial class SettingsPage : ContentPage
             return;
         }
 
-        UpdateSettings();
-        await Toast.Make("Settings saved").Show();
+        await UpdateSettings();
     }
 
     private void NotificationsExpandedChanged(object sender, CommunityToolkit.Maui.Core.ExpandedChangedEventArgs e)
