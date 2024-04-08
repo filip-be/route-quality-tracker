@@ -42,6 +42,7 @@ public class MediaButtonHandlerService : Service
 
     public override bool StopService(Intent? name)
     {
+        _androidNotificationService.SetMediaSession(null);
         _qualityTrackerService.OnRouteQualityChanged -= UpdateMediaSessionMetadata;
         _qualityTrackerService.OnRouteQualityChanged -= _androidNotificationService.HandleRouteQualityChangeEvent;
         return base.StopService(name);
@@ -76,6 +77,7 @@ public class MediaButtonHandlerService : Service
         _qualityTrackerService.OnRouteQualityChanged += _androidNotificationService.HandleRouteQualityChangeEvent;
 
         _serviceManager.SetStatus(true);
+        _androidNotificationService.SetMediaSession(_mediaSession);
 
         return StartCommandResult.NotSticky;
     }
