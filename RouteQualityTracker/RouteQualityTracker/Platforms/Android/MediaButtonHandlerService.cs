@@ -1,10 +1,12 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Media;
 using Android.Media.Session;
 using Android.OS;
 using Android.Runtime;
 using RouteQualityTracker.Core.Interfaces;
+using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
 
 namespace RouteQualityTracker.Platforms.Android;
@@ -40,6 +42,7 @@ public class MediaButtonHandlerService : Service
 
     public override bool StopService(Intent? name)
     {
+        _qualityTrackerService.OnRouteQualityChanged -= UpdateMediaSessionMetadata;
         _qualityTrackerService.OnRouteQualityChanged -= _androidNotificationService.HandleRouteQualityChangeEvent;
         return base.StopService(name);
     }
@@ -60,19 +63,35 @@ public class MediaButtonHandlerService : Service
 
         if (_mediaSession == null)
         {
+            
             _mediaSession = new MediaSession(this, MediaSessionName);
 
-            _mediaSession.SetFlags(MediaSessionFlags.HandlesMediaButtons);
+            _mediaSession.SetFlags(MediaSessionFlags.HandlesMediaButtons | MediaSessionFlags.HandlesTransportControls);
             _mediaSession.SetCallback(new MediaSessionCallback());
         }
 
         _mediaSession.Active = true;
 
+        _qualityTrackerService.OnRouteQualityChanged += UpdateMediaSessionMetadata;
         _qualityTrackerService.OnRouteQualityChanged += _androidNotificationService.HandleRouteQualityChangeEvent;
 
         _serviceManager.SetStatus(true);
 
         return StartCommandResult.NotSticky;
+    }
+
+    private void UpdateMediaSessionMetadata(object? sender, RouteQualityEnum routeQuality)
+    {
+        if (_mediaSession == null) return;
+
+        var builder = new MediaMetadata.Builder();
+
+        builder
+            .PutString(MediaMetadata.MetadataKeyAlbum, "Route Quality")!
+            .PutString(MediaMetadata.MetadataKeyArtist, "Tracker")!
+            .PutString(MediaMetadata.MetadataKeyTitle, routeQuality.ToString());
+        
+        _mediaSession.SetMetadata(builder.Build());
     }
 
     public override IBinder? OnBind(Intent? intent)

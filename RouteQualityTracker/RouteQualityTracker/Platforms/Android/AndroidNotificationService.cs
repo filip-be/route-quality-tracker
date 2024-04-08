@@ -1,5 +1,7 @@
 ﻿using _Microsoft.Android.Resource.Designer;
 using Android.App;
+using Android.Content;
+using Android.Media.Session;
 using Android.Telephony;
 using AndroidX.Core.App;
 using RouteQualityTracker.Core.Interfaces;
@@ -15,6 +17,12 @@ public class AndroidNotificationService(IServiceManager serviceManager, ISetting
     private int? _notificationId;
     private NotificationManager? _notificationManager;
     private Service? _parentService;
+    private MediaSession? _mediaSession;
+
+    public void SetMediaSession(MediaSession? mediaSession)
+    {
+        _mediaSession = mediaSession;
+    }
 
     public Notification CreateActivityNotification(Service service, string? text)
     {
@@ -25,6 +33,14 @@ public class AndroidNotificationService(IServiceManager serviceManager, ISetting
             .SetSmallIcon(ResourceConstant.Mipmap.appicon)
             .SetContentTitle("Foreground Service")
             .SetContentText(text ?? string.Empty);
+
+        if (_mediaSession is not null)
+        {
+            notificationBuilder.SetOngoing(true);
+            //notificationBuilder.AddAction(global::Android.Resource.Drawable.IcMediaPrevious, "Previous", )
+            //notificationBuilder.AddAction(global::Android.Resource.Drawable.IcMediaPrevious, "Previous", )
+            //notificationBuilder.AddAction(global::Android.Resource.Drawable.IcMediaPrevious, "Previous", )
+        }
 
         return notificationBuilder.Build();
     }
