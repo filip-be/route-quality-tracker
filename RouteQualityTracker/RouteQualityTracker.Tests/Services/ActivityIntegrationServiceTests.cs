@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Services;
@@ -13,7 +14,9 @@ public class ActivityIntegrationServiceTests
     [SetUp]
     public void SetUp()
     {
-        _service = new ActivityIntegrationService();
+        var fakeSettingsService = new Mock<ISettingsService>();
+        var fakeClientFactory = new Mock<IHttpClientFactory>();
+        _service = new ActivityIntegrationService(fakeSettingsService.Object, fakeClientFactory.Object);
     }
 
     [Test]
