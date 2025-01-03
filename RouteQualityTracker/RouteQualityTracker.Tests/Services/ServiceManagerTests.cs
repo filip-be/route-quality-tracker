@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Services;
@@ -13,7 +14,7 @@ public class ServiceManagerTests
     [SetUp]
     public void SetUp()
     {
-        _serviceManager = new ServiceManager();
+        _serviceManager = new ServiceManager(Mock.Of<ILoggingService>());
     }
 
     [TestCase(true)]

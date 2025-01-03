@@ -36,6 +36,24 @@
                 SemanticProperties.Hint="Save route quality data"
                 Clicked="OnSaveClicked"
                 HorizontalOptions="Fill" />
+
+            <Label
+                x:Name="DebugLabel"
+                Text="Debug log"
+                IsVisible="false" />
+            <Editor
+                x:Name="DebugEditor"
+                IsVisible="false"
+                IsEnabled="False"
+                VerticalTextAlignment="Start"
+                HorizontalTextAlignment="Start"
+                Placeholder="Nothing yet to show"
+                AutoSize="TextChanges" />
+            <Button
+                x:Name="ClearDebugLogBtn"
+                Text="Clear debug log"
+                Clicked="OnClearDebugLogClicked"
+                HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

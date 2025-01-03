@@ -12,12 +12,16 @@ public class QualityTrackingService : IQualityTrackingService
     
     private readonly TimeProvider _timeProvider;
     private readonly INotificationService _notificationService;
+    private readonly ILoggingService _loggingService;
 
-    public QualityTrackingService(TimeProvider timeProvider, INotificationService notificationService)
+    public QualityTrackingService(TimeProvider timeProvider, 
+        INotificationService notificationService,
+        ILoggingService loggingService)
     {
         OnRouteQualityChanged += OnRouteQualityChangedInternal;
         _timeProvider = timeProvider;
         _notificationService = notificationService;
+        _loggingService = loggingService;
     }
 
     private void OnRouteQualityChangedInternal(object? sender, RouteQualityEnum e)
@@ -32,6 +36,7 @@ public class QualityTrackingService : IQualityTrackingService
         {
             _notificationService.SendEmail(_currentRouteQuality);
         }
+        _loggingService.LogDebugMessage($"Route quality changed to {_currentRouteQuality}");
     }
 
     public void StartTracking()
@@ -40,11 +45,15 @@ public class QualityTrackingService : IQualityTrackingService
         _currentRouteQuality = RouteQualityEnum.Standard;
         _isQualityIncreasing = true;
         OnRouteQualityChanged?.Invoke(this, _currentRouteQuality);
+
+        _loggingService.LogDebugMessage("Started tracking route quality");
     }
 
     public void StopTracking()
     {
         _currentRouteQuality = RouteQualityEnum.Unknown;
+
+        _loggingService.LogDebugMessage("Stopped tracking route quality");
     }
 
     public void ToggleRouteQuality()
@@ -76,6 +85,7 @@ public class QualityTrackingService : IQualityTrackingService
     {
         return _currentRouteQuality;
     }
+
     public IList<RouteQualityRecord> GetRouteQualityRecords()
     {
         return _routeQualityData;

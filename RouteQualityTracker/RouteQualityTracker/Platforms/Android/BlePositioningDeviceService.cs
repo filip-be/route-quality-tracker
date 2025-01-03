@@ -16,7 +16,6 @@ public class BlePositioningDeviceService : Service
     private readonly IAndroidNotificationService _androidNotificationService = ServiceHelper.Services.GetService<IAndroidNotificationService>()!;
     private readonly IQualityTrackingService _qualityTrackerService = ServiceHelper.Services.GetService<IQualityTrackingService>()!;
 
-
     private NotificationManager NotificationManager => (NotificationManager)GetSystemService(NotificationService)!;
     private const int NotificationId = 1010;
 

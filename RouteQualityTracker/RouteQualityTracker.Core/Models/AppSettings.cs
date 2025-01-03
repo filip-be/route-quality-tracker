@@ -2,6 +2,8 @@
 
 public class AppSettings
 {
+    public bool Debug { get; set; }
+
     public bool SendEmail { get; set; }
 
     public bool SendSms { get; set; }

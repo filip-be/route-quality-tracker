@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Storage;
 using RouteQualityTracker.Core.Interfaces;
+using RouteQualityTracker.Core.Services;
 using System.Text;
 using System.Text.Json;
 
@@ -11,17 +12,38 @@ public partial class MainPage : ContentPage
 {
     private readonly IServiceManager _serviceManager;
     private readonly IQualityTrackingService _qualityTrackingService;
+    private readonly ISettingsService _settingsService;
+    private readonly ILoggingService _loggingService;
 
-    public MainPage(IServiceManager serviceManager, IQualityTrackingService qualityTrackingService)
+    public MainPage()
     {
         InitializeComponent();
 
-        _serviceManager = serviceManager;
-        _qualityTrackingService = qualityTrackingService;
+        _serviceManager = ServiceHelper.GetService<IServiceManager>();
+        _qualityTrackingService = ServiceHelper.GetService<IQualityTrackingService>();
+        _settingsService = ServiceHelper.GetService<ISettingsService>();
+        _loggingService = ServiceHelper.GetService<ILoggingService>();
+
         _serviceManager.OnServiceStarted += OnServiceStarted;
         _serviceManager.OnServiceStopped += OnServiceStopped;
         _serviceManager.OnServiceStartError += OnServiceStartError;
         _serviceManager.OnDisplayMessage += OnDisplayMessage;
+
+        _loggingService.OnLogDebugMessage += (sender, message) =>
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                DebugLabel.Text += $"{message}{Environment.NewLine}";
+            });
+        };
+    }
+
+    protected override void OnAppearing()
+    {
+        DebugLabel.IsVisible = _settingsService.Settings.Debug;
+        DebugEditor.IsVisible = _settingsService.Settings.Debug;
+
+        base.OnAppearing();
     }
 
     private void OnDisplayMessage(object? _, string message)
@@ -66,7 +88,6 @@ public partial class MainPage : ContentPage
 
     private void OnToggleServiceClicked(object sender, EventArgs e)
     {
-        //ToggleServiceBtn.IsEnabled = false;
         _serviceManager.ToggleService();
     }
 
@@ -88,5 +109,10 @@ public partial class MainPage : ContentPage
         {
             await Toast.Make($"The file was not saved successfully with error: {fileSaverResult.Exception.Message}").Show();
         }
+    }
+
+    private void OnClearDebugLogClicked(object sender, EventArgs e)
+    {
+        //DebugLabel.Text = string.Empty;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using _Microsoft.Android.Resource.Designer;
 using Android.App;
-using Android.Content;
 using Android.Media.Session;
 using Android.Telephony;
 using AndroidX.Core.App;
@@ -30,7 +29,7 @@ public class AndroidNotificationService(IServiceManager serviceManager, ISetting
                 .Builder(service, ChannelId)
             .SetAutoCancel(false)
             .SetOngoing(true)
-            .SetSmallIcon(ResourceConstant.Mipmap.appicon)
+            //.SetSmallIcon(ResourceConstant.Mipmap.appicon)
             .SetContentTitle("Foreground Service")
             .SetContentText(text ?? string.Empty);
 

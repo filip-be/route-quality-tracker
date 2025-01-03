@@ -2,7 +2,6 @@ using CommunityToolkit.Maui.Alerts;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
-using RouteQualityTracker.Services;
 
 namespace RouteQualityTracker.Pages;
 
@@ -53,6 +52,7 @@ public partial class SettingsPage : ContentPage
             UseHeadset.IsEnabled = true;
             UseMediaControls.IsEnabled = true;
             UseCustomDevice.IsEnabled = true;
+            DebugSwitch.IsEnabled = true;
             SendSmsSwitch.IsEnabled = true;
             SendEmailsSwitch.IsEnabled = true;
         }
@@ -73,6 +73,7 @@ public partial class SettingsPage : ContentPage
         UseCustomDevice.IsToggled = _settingsService.Settings.UseCustomDevice;
         ImportDataFromFile.IsToggled = _settingsService.Settings.ImportDataFromFile;
         ImportFromStrava.IsToggled = _settingsService.Settings.ImportFromStrava;
+        DebugSwitch.IsToggled = _settingsService.Settings.Debug;
         SendSmsSwitch.IsToggled = _settingsService.Settings.SendSms;
         SmsNumber.Text = _settingsService.Settings.SmsNumber;
         SendEmailsSwitch.IsToggled = _settingsService.Settings.SendEmail;
@@ -94,6 +95,7 @@ public partial class SettingsPage : ContentPage
             UseCustomDevice = UseCustomDevice.IsToggled,
             ImportDataFromFile = ImportDataFromFile.IsToggled,
             ImportFromStrava = ImportFromStrava.IsToggled,
+            Debug = DebugSwitch.IsToggled,
             SendSms = SendSmsSwitch.IsToggled,
             SmsNumber = SmsNumber.Text,
             SendEmail = SendEmailsSwitch.IsToggled,

@@ -196,11 +196,20 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="50"/>
                         </Grid.ColumnDefinitions>
-                        <Label Text="Send SMS notifications" VerticalOptions="Center" Grid.Column="0"/>
+
+                        <Label Text="Debug" VerticalOptions="Center" Grid.Column="0" Grid.Row="0" />
+                        <Switch x:Name="DebugSwitch"
+                                IsEnabled="False"
+                                IsToggled="False"
+                                Grid.Column="1"
+                                Grid.Row="0"/>
+
+                        <Label Text="Send SMS notifications" VerticalOptions="Center" Grid.Column="0" Grid.Row="1" />
                         <Switch x:Name="SendSmsSwitch"
                                 IsEnabled="False"
                                 IsToggled="False"
-                                Grid.Column="1"/>
+                                Grid.Column="1"
+                                Grid.Row="1"/>
                     </Grid>
 
                     <Label Text="To (SMS)" />

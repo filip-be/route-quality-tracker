@@ -64,7 +64,6 @@ public class MediaButtonHandlerService : Service
 
         if (_mediaSession == null)
         {
-            
             _mediaSession = new MediaSession(this, MediaSessionName);
 
             _mediaSession.SetFlags(MediaSessionFlags.HandlesMediaButtons | MediaSessionFlags.HandlesTransportControls);

@@ -4,6 +4,7 @@ namespace RouteQualityTracker.Core.Interfaces;
 
 public interface ISettingsService
 {
+    const string DebugProp = "Debug";
     const string SendSmsProp = "SendSms";
     const string SendSmsNumberProp = "SendSmsNumber";
     const string SendEmailsProp = "SendEmails";

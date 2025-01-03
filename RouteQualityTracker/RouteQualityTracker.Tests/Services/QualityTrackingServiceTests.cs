@@ -13,15 +13,18 @@ public class QualityTrackingServiceTests
 {
     private Mock<TimeProvider> _timePoviderFake;
     private Mock<INotificationService> _notificationServiceFake;
+    private Mock<ILoggingService> _loggingServiceFake;
 
-    private IQualityTrackingService GetService => 
-        new QualityTrackingService(_timePoviderFake.Object, _notificationServiceFake.Object);
+    private IQualityTrackingService GetService =>
+        new QualityTrackingService(_timePoviderFake.Object, _notificationServiceFake.Object, _loggingServiceFake.Object);
 
     [SetUp]
     public void SetUp()
     {
         _notificationServiceFake = new Mock<INotificationService>();
         _timePoviderFake = new Mock<TimeProvider>();
+        _loggingServiceFake = new Mock<ILoggingService>();
+
         SetupCurrentDate(new DateTimeOffset());
     }
 
