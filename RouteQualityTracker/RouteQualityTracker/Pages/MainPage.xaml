@@ -51,6 +51,7 @@
                 AutoSize="TextChanges" />
             <Button
                 x:Name="ClearDebugLogBtn"
+                IsVisible="False"
                 Text="Clear debug log"
                 Clicked="OnClearDebugLogClicked"
                 HorizontalOptions="Fill" />

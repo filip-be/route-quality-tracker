@@ -1,4 +1,5 @@
 ﻿using Android.Bluetooth;
+using Java.Util;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
@@ -11,6 +12,8 @@ public class RouteQualityGattCallback : BluetoothGattCallback
     private readonly IServiceManager _serviceManager = ServiceHelper.Services.GetService<IServiceManager>()!;
     private readonly IQualityTrackingService _qualityTrackingService = ServiceHelper.GetService<IQualityTrackingService>();
     private readonly ILoggingService _loggingService = ServiceHelper.GetService<ILoggingService>();
+
+    private const long PositionQualityCharacteristicUuuid = 0x2A6900001000;
 
     public override void OnServicesDiscovered(BluetoothGatt? gatt, GattStatus status)
     {
@@ -44,7 +47,7 @@ public class RouteQualityGattCallback : BluetoothGattCallback
 
             _loggingService.LogDebugMessage($"Gatt characteristics: {string.Join(Environment.NewLine, allCharacteristics.Select(c => c.Uuid))}");
        
-            var qualityCharacteristic = allCharacteristics.Find(c => c.Uuid?.MostSignificantBits == 0x2A6900001000);
+            var qualityCharacteristic = allCharacteristics.Find(c => c.Uuid?.MostSignificantBits == PositionQualityCharacteristicUuuid);
             if (qualityCharacteristic is null)
             {
                 gatt.Disconnect();
@@ -52,7 +55,30 @@ public class RouteQualityGattCallback : BluetoothGattCallback
                 return;
             }
 
-            gatt.SetCharacteristicNotification(qualityCharacteristic, true);
+            var result = gatt.SetCharacteristicNotification(qualityCharacteristic, true);
+            _loggingService.LogDebugMessage($"Characteristic {qualityCharacteristic.Uuid?.MostSignificantBits:X} notification set: {result}");
+
+            qualityCharacteristic.Descriptors
+                ?.ToList()
+                .ForEach(desc => _loggingService.LogDebugMessage($"Descriptor UUID: {desc.Uuid}"));
+
+            var configDescriptorUuid = UUID.FromString("00002902-0000-1000-8000-00805f9b34fb");
+            var desc = qualityCharacteristic.GetDescriptor(configDescriptorUuid);
+            if (desc is null)
+            {
+                _serviceManager.SetStatus(false, new InvalidOperationException("Config descriptor not available for characteristic"));
+                return;
+            }
+
+            if (OperatingSystem.IsAndroidVersionAtLeast(33))
+            {
+                gatt.WriteDescriptor(desc, BluetoothGattDescriptor.EnableNotificationValue!.ToArray());
+            }
+            else
+            {
+                desc.SetValue(BluetoothGattDescriptor.EnableNotificationValue!.ToArray());
+                gatt.WriteDescriptor(desc);
+            }
 
             return;
         }
@@ -93,7 +119,7 @@ public class RouteQualityGattCallback : BluetoothGattCallback
         }
 
         var characteristicValue = value[0];
-        _loggingService.LogDebugMessage($"Received {characteristic.Uuid}: {characteristicValue}");
+        _loggingService.LogDebugMessage($"Received {characteristic.Uuid}: {characteristicValue:X}");
 
         if (!Enum.TryParse(characteristicValue.ToString(), out RouteQualityEnum routeQuality))
         {
@@ -109,6 +135,7 @@ public class RouteQualityGattCallback : BluetoothGattCallback
     {
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
+            _loggingService.LogDebugMessage("Charactericts received, but android version is higher than 33");
             return;
         }
 
@@ -118,7 +145,7 @@ public class RouteQualityGattCallback : BluetoothGattCallback
             return;
         }
 
-        var characteristicValue = characteristic.GetIntValue(GattFormat.Sint32, 0);
+        var characteristicValue = characteristic.GetIntValue(GattFormat.Sint32, 0)!;
         _loggingService.LogDebugMessage($"Received {characteristic.Uuid}: {characteristicValue}");
 
         if (!Enum.TryParse(characteristicValue.ToString(), out RouteQualityEnum routeQuality))

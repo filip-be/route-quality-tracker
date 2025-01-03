@@ -42,6 +42,7 @@ public partial class MainPage : ContentPage
     {
         DebugLabel.IsVisible = _settingsService.Settings.Debug;
         DebugEditor.IsVisible = _settingsService.Settings.Debug;
+        ClearDebugLogBtn.IsVisible = _settingsService.Settings.Debug;
 
         base.OnAppearing();
     }
