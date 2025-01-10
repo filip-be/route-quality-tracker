@@ -36,7 +36,7 @@ public class QualityTrackingService : IQualityTrackingService
         {
             _notificationService.SendEmail(_currentRouteQuality);
         }
-        _loggingService.LogDebugMessage($"Route quality changed to {_currentRouteQuality}");
+        _loggingService.Info($"Route quality changed to {_currentRouteQuality}");
     }
 
     public void StartTracking()
@@ -46,14 +46,14 @@ public class QualityTrackingService : IQualityTrackingService
         _isQualityIncreasing = true;
         OnRouteQualityChanged?.Invoke(this, _currentRouteQuality);
 
-        _loggingService.LogDebugMessage("Started tracking route quality");
+        _loggingService.Trace("Started tracking route quality");
     }
 
     public void StopTracking()
     {
         _currentRouteQuality = RouteQualityEnum.Unknown;
 
-        _loggingService.LogDebugMessage("Stopped tracking route quality");
+        _loggingService.Trace("Stopped tracking route quality");
     }
 
     public void ToggleRouteQuality()

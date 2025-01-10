@@ -1,4 +1,5 @@
 using CommunityToolkit.Maui.Alerts;
+using Microsoft.Extensions.Logging;
 using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
 using RouteQualityTracker.Core.Services;
@@ -21,6 +22,18 @@ public partial class SettingsPage : ContentPage
         _serviceManager = ServiceHelper.Services.GetService<IServiceManager>()!;
         _activityIntegrationService = ServiceHelper.GetService<IActivityIntegrationService>();
         _activityIntegrationService.OnStravaAuthenticationCompleted += OnStravaAuthenticationCompletedAsync;
+
+        var items = new List<LogLevel>
+        {
+            LogLevel.Trace,
+            LogLevel.Debug,
+            LogLevel.Information,
+            LogLevel.Warning,
+            LogLevel.Error,
+            LogLevel.Critical,
+            LogLevel.None,
+        };
+        LogLevelPicker.ItemsSource = items;
     }
 
     private async Task OnStravaAuthenticationCompletedAsync(object? sender, EventArgs eventArgs)
@@ -52,7 +65,7 @@ public partial class SettingsPage : ContentPage
             UseHeadset.IsEnabled = true;
             UseMediaControls.IsEnabled = true;
             UseCustomDevice.IsEnabled = true;
-            DebugSwitch.IsEnabled = true;
+            LogLevelPicker.IsEnabled = true;
             SendSmsSwitch.IsEnabled = true;
             SendEmailsSwitch.IsEnabled = true;
         }
@@ -73,7 +86,7 @@ public partial class SettingsPage : ContentPage
         UseCustomDevice.IsToggled = _settingsService.Settings.UseCustomDevice;
         ImportDataFromFile.IsToggled = _settingsService.Settings.ImportDataFromFile;
         ImportFromStrava.IsToggled = _settingsService.Settings.ImportFromStrava;
-        DebugSwitch.IsToggled = _settingsService.Settings.Debug;
+        LogLevelPicker.SelectedItem = _settingsService.Settings.LogLevel;
         SendSmsSwitch.IsToggled = _settingsService.Settings.SendSms;
         SmsNumber.Text = _settingsService.Settings.SmsNumber;
         SendEmailsSwitch.IsToggled = _settingsService.Settings.SendEmail;
@@ -95,7 +108,7 @@ public partial class SettingsPage : ContentPage
             UseCustomDevice = UseCustomDevice.IsToggled,
             ImportDataFromFile = ImportDataFromFile.IsToggled,
             ImportFromStrava = ImportFromStrava.IsToggled,
-            Debug = DebugSwitch.IsToggled,
+            LogLevel = (LogLevel)LogLevelPicker.SelectedItem,
             SendSms = SendSmsSwitch.IsToggled,
             SmsNumber = SmsNumber.Text,
             SendEmail = SendEmailsSwitch.IsToggled,

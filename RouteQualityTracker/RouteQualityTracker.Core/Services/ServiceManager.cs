@@ -17,12 +17,12 @@ public class ServiceManager : IServiceManager
     {
         if (IsRunning)
         {
-            _loggingService.LogDebugMessage("Stopping service...");
+            _loggingService.Debug("Stopping service...");
             OnServiceStop?.Invoke(this, null!);
         }
         else
         {
-            _loggingService.LogDebugMessage("Starting service...");
+            _loggingService.Debug("Starting service...");
             OnServiceStart?.Invoke(this, null!);
         }
     }
@@ -33,16 +33,16 @@ public class ServiceManager : IServiceManager
 
         if (IsRunning)
         {
-            _loggingService.LogDebugMessage("Service is running");
+            _loggingService.Debug("Service is running");
             OnServiceStarted?.Invoke(this, null!);
         }
         else
         {
-            _loggingService.LogDebugMessage("Service stopped");
+            _loggingService.Debug("Service stopped");
             OnServiceStopped?.Invoke(this, null!);
             if (ex != null)
             {
-                _loggingService.LogDebugMessage($"Error occured: {ex.Message}");
+                _loggingService.Debug($"Error occured: {ex.Message}");
                 OnServiceStartError?.Invoke(this, ex);
             }
         }
@@ -50,7 +50,7 @@ public class ServiceManager : IServiceManager
 
     public void DisplayMessage(string message)
     {
-        _loggingService.LogDebugMessage(message);
+        _loggingService.Trace(message);
         OnDisplayMessage?.Invoke(this, message);
     }
 

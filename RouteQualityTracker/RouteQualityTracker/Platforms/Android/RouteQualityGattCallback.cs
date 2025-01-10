@@ -17,10 +17,10 @@ public class RouteQualityGattCallback : BluetoothGattCallback
 
     public override void OnServicesDiscovered(BluetoothGatt? gatt, GattStatus status)
     {
-        _loggingService.LogDebugMessage($"OnServicesDiscovered: {status}");
+        _loggingService.Trace($"OnServicesDiscovered: {status}");
         if (status == GattStatus.Success)
         {
-            _loggingService.LogDebugMessage("GattStatus is Success");
+            _loggingService.Trace("GattStatus is Success");
             if (gatt is null)
             {
                 _serviceManager.SetStatus(false, new InvalidOperationException("Connection succeeded but Bluetooth service is empty"));
@@ -45,7 +45,7 @@ public class RouteQualityGattCallback : BluetoothGattCallback
                 return;
             }
 
-            _loggingService.LogDebugMessage($"Gatt characteristics: {string.Join(Environment.NewLine, allCharacteristics.Select(c => c.Uuid))}");
+            _loggingService.Trace($"Gatt characteristics: {string.Join(Environment.NewLine, allCharacteristics.Select(c => c.Uuid))}");
        
             var qualityCharacteristic = allCharacteristics.Find(c => c.Uuid?.MostSignificantBits == PositionQualityCharacteristicUuuid);
             if (qualityCharacteristic is null)
@@ -56,11 +56,11 @@ public class RouteQualityGattCallback : BluetoothGattCallback
             }
 
             var result = gatt.SetCharacteristicNotification(qualityCharacteristic, true);
-            _loggingService.LogDebugMessage($"Characteristic {qualityCharacteristic.Uuid?.MostSignificantBits:X} notification set: {result}");
+            _loggingService.Trace($"Characteristic {qualityCharacteristic.Uuid?.MostSignificantBits:X} notification set: {result}");
 
             qualityCharacteristic.Descriptors
                 ?.ToList()
-                .ForEach(desc => _loggingService.LogDebugMessage($"Descriptor UUID: {desc.Uuid}"));
+                .ForEach(desc => _loggingService.Trace($"Descriptor UUID: {desc.Uuid}"));
 
             var configDescriptorUuid = UUID.FromString("00002902-0000-1000-8000-00805f9b34fb");
             var desc = qualityCharacteristic.GetDescriptor(configDescriptorUuid);
@@ -88,7 +88,7 @@ public class RouteQualityGattCallback : BluetoothGattCallback
 
     public override void OnConnectionStateChange(BluetoothGatt? gatt, GattStatus status, ProfileState newState)
     {
-        _loggingService.LogDebugMessage($"OnConnectionStateChange: {status}");
+        _loggingService.Trace($"OnConnectionStateChange: {status}");
         if (status == GattStatus.Success)
         {
             if (gatt is null)
@@ -119,7 +119,7 @@ public class RouteQualityGattCallback : BluetoothGattCallback
         }
 
         var characteristicValue = value[0];
-        _loggingService.LogDebugMessage($"Received {characteristic.Uuid}: {characteristicValue:X}");
+        _loggingService.Trace($"Received {characteristic.Uuid}: {characteristicValue:X}");
 
         if (!Enum.TryParse(characteristicValue.ToString(), out RouteQualityEnum routeQuality))
         {
@@ -135,18 +135,18 @@ public class RouteQualityGattCallback : BluetoothGattCallback
     {
         if (OperatingSystem.IsAndroidVersionAtLeast(33))
         {
-            _loggingService.LogDebugMessage("Charactericts received, but android version is higher than 33");
+            _loggingService.Trace("Charactericts received, but android version is higher than 33");
             return;
         }
 
         if (characteristic is null)
         {
-            _loggingService.LogDebugMessage("Received empty characteristic!");
+            _loggingService.Trace("Received empty characteristic!");
             return;
         }
 
         var characteristicValue = characteristic.GetIntValue(GattFormat.Sint32, 0)!;
-        _loggingService.LogDebugMessage($"Received {characteristic.Uuid}: {characteristicValue}");
+        _loggingService.Trace($"Received {characteristic.Uuid}: {characteristicValue}");
 
         if (!Enum.TryParse(characteristicValue.ToString(), out RouteQualityEnum routeQuality))
         {

@@ -1,4 +1,5 @@
-﻿using RouteQualityTracker.Core.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using RouteQualityTracker.Core.Interfaces;
 using RouteQualityTracker.Core.Models;
 
 namespace RouteQualityTracker.Services;
@@ -28,7 +29,7 @@ public class SettingsService(AppSettings settings) : ISettingsService
         Preferences.Default.Set(ISettingsService.UseCustomDeviceProp, newSettings.UseCustomDevice);
         Preferences.Default.Set(ISettingsService.ImportDataFromFileProp, newSettings.ImportDataFromFile);
         Preferences.Default.Set(ISettingsService.ImportFromStravaProp, newSettings.ImportFromStrava);
-        Preferences.Default.Set(ISettingsService.DebugProp, newSettings.Debug);
+        Preferences.Default.Set(ISettingsService.LogLevelProp, newSettings.LogLevel.ToString());
         Preferences.Default.Set(ISettingsService.SendSmsProp, newSettings.SendSms);
         Preferences.Default.Set(ISettingsService.SendSmsNumberProp, newSettings.SmsNumber);
         Preferences.Default.Set(ISettingsService.SendEmailsProp, newSettings.SendEmail);
@@ -43,7 +44,7 @@ public class SettingsService(AppSettings settings) : ISettingsService
         settings.UseCustomDevice = newSettings.UseCustomDevice;
         settings.ImportDataFromFile = newSettings.ImportDataFromFile;
         settings.ImportFromStrava = newSettings.ImportFromStrava;
-        settings.Debug = newSettings.Debug;
+        settings.LogLevel = newSettings.LogLevel;
         settings.SendSms = newSettings.SendSms;
         settings.SmsNumber = newSettings.SmsNumber;
         settings.SendEmail = newSettings.SendEmail;
@@ -68,7 +69,10 @@ public class SettingsService(AppSettings settings) : ISettingsService
         settings.ImportDataFromFile = Preferences.Default.Get(ISettingsService.ImportDataFromFileProp, true);
         settings.ImportFromStrava = Preferences.Default.Get(ISettingsService.ImportFromStravaProp, false);
         settings.StravaApiCode = Preferences.Default.Get(ISettingsService.StravaApiCodeProp, string.Empty);
-        settings.Debug = Preferences.Default.Get(ISettingsService.DebugProp, false);
+
+        var logLevelSet = Preferences.Default.Get(ISettingsService.LogLevelProp, LogLevel.Information.ToString());
+        settings.LogLevel = Enum.Parse<LogLevel>(logLevelSet);
+        
         settings.SendSms = Preferences.Default.Get(ISettingsService.SendSmsProp, false);
         settings.SmsNumber = Preferences.Default.Get(ISettingsService.SendSmsNumberProp, string.Empty);
         settings.SendEmail = Preferences.Default.Get(ISettingsService.SendEmailsProp, false);

@@ -12,7 +12,6 @@ public partial class MainPage : ContentPage
 {
     private readonly IServiceManager _serviceManager;
     private readonly IQualityTrackingService _qualityTrackingService;
-    private readonly ISettingsService _settingsService;
     private readonly ILoggingService _loggingService;
 
     public MainPage()
@@ -21,7 +20,6 @@ public partial class MainPage : ContentPage
 
         _serviceManager = ServiceHelper.GetService<IServiceManager>();
         _qualityTrackingService = ServiceHelper.GetService<IQualityTrackingService>();
-        _settingsService = ServiceHelper.GetService<ISettingsService>();
         _loggingService = ServiceHelper.GetService<ILoggingService>();
 
         _serviceManager.OnServiceStarted += OnServiceStarted;
@@ -33,18 +31,9 @@ public partial class MainPage : ContentPage
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                DebugLabel.Text += $"{message}{Environment.NewLine}";
+                DebugEditor.Text += $"{message}{Environment.NewLine}";
             });
         };
-    }
-
-    protected override void OnAppearing()
-    {
-        DebugLabel.IsVisible = _settingsService.Settings.Debug;
-        DebugEditor.IsVisible = _settingsService.Settings.Debug;
-        ClearDebugLogBtn.IsVisible = _settingsService.Settings.Debug;
-
-        base.OnAppearing();
     }
 
     private void OnDisplayMessage(object? _, string message)
@@ -114,6 +103,6 @@ public partial class MainPage : ContentPage
 
     private void OnClearDebugLogClicked(object sender, EventArgs e)
     {
-        //DebugLabel.Text = string.Empty;
+        DebugEditor.Text = string.Empty;
     }
 }

@@ -40,18 +40,18 @@
             <Label
                 x:Name="DebugLabel"
                 Text="Debug log"
-                IsVisible="false" />
+                Style="{StaticResource SubHeadline}"
+                SemanticProperties.HeadingLevel="Level3"
+                SemanticProperties.Description="Debug log"
+                HorizontalOptions="Fill" />
             <Editor
                 x:Name="DebugEditor"
-                IsVisible="false"
-                IsEnabled="False"
                 VerticalTextAlignment="Start"
                 HorizontalTextAlignment="Start"
                 Placeholder="Nothing yet to show"
                 AutoSize="TextChanges" />
             <Button
                 x:Name="ClearDebugLogBtn"
-                IsVisible="False"
                 Text="Clear debug log"
                 Clicked="OnClearDebugLogClicked"
                 HorizontalOptions="Fill" />

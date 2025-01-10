@@ -1,8 +1,10 @@
-﻿namespace RouteQualityTracker.Core.Models;
+﻿using Microsoft.Extensions.Logging;
+
+namespace RouteQualityTracker.Core.Models;
 
 public class AppSettings
 {
-    public bool Debug { get; set; }
+    public LogLevel LogLevel { get; set; }
 
     public bool SendEmail { get; set; }
 

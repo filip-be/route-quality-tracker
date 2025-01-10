@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:RouteQualityTracker.Pages"
              x:Class="RouteQualityTracker.Pages.SettingsPage"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Name="Self">
@@ -47,16 +48,12 @@
                             Margin="0, 10"
                             HeightRequest="1" 
                             Color="LightGray"/>
-
-                        <Label x:Name="InputDeviceToggleDisabledLabel"
-                               IsVisible="False"
-                               FontAttributes="Bold"
-                               Text="Service must be stopped to modify input settings" />
                     </VerticalStackLayout>
                 </toolkit:Expander.Header>
                 <VerticalStackLayout Padding="10" Spacing="5">
                     <Grid x:Name="InputOptionsGrid">
                         <Grid.RowDefinitions>
+                            <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
@@ -66,31 +63,39 @@
                             <ColumnDefinition Width="50"/>
                         </Grid.ColumnDefinitions>
 
-                        <Label Text="Use headset" VerticalOptions="Center" Grid.Column="0"/>
+                        <Label x:Name="InputDeviceToggleDisabledLabel"
+                               IsVisible="False"
+                               FontAttributes="Bold"
+                               Text="Service must be stopped to modify input settings"
+                               Grid.Column="0"
+                               Grid.ColumnSpan="2"
+                               Grid.Row="0" />
+
+                        <Label Text="Use headset" VerticalOptions="Center" Grid.Column="0" Grid.Row="1" />
                         <Switch x:Name="UseHeadset"
                                 Toggled="OnUseHeadsetToggled"
                                 IsEnabled="False"
                                 IsToggled="False"
                                 Grid.Column="1"
-                                Grid.Row="0" />
+                                Grid.Row="1" />
 
 
-                        <Label Text="Use media controls" VerticalOptions="Center" Grid.Column="0" Grid.Row="1"/>
+                        <Label Text="Use media controls" VerticalOptions="Center" Grid.Column="0" Grid.Row="2"/>
                         <Switch x:Name="UseMediaControls"
                                 Toggled="OnUseMediaControlsToggled"
                                 IsEnabled="False"
                                 IsToggled="False"
                                 Grid.Column="1"
-                                Grid.Row="1"/>
+                                Grid.Row="2"/>
 
 
-                        <Label Text="Use position status device" VerticalOptions="Center" Grid.Column="0" Grid.Row="2"/>
+                        <Label Text="Use position status device" VerticalOptions="Center" Grid.Column="0" Grid.Row="3"/>
                         <Switch x:Name="UseCustomDevice"
                                 Toggled="OnUseCustomDeviceToggled"
                                 IsEnabled="False"
                                 IsToggled="False"
                                 Grid.Column="1"
-                                Grid.Row="2"/>
+                                Grid.Row="3"/>
                     </Grid>
                 </VerticalStackLayout>
             </toolkit:Expander>
@@ -201,12 +206,12 @@
                             <ColumnDefinition Width="50"/>
                         </Grid.ColumnDefinitions>
 
-                        <Label Text="Debug" VerticalOptions="Center" Grid.Column="0" Grid.Row="0" />
-                        <Switch x:Name="DebugSwitch"
+                        <Label Text="Log level" VerticalOptions="Center" Grid.Column="0" Grid.Row="0" />
+                        <Picker x:Name="LogLevelPicker"
                                 IsEnabled="False"
-                                IsToggled="False"
                                 Grid.Column="1"
-                                Grid.Row="0"/>
+                                Grid.Row="0">
+                        </Picker>
 
                         <Label Text="Send SMS notifications" VerticalOptions="Center" Grid.Column="0" Grid.Row="1" />
                         <Switch x:Name="SendSmsSwitch"

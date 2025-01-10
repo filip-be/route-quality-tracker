@@ -41,7 +41,7 @@ public class MainActivity : MauiAppCompatActivity
 
         if (requestCode != StravaAuthorizeCallbackActivity.ActivityRequestCode) return;
 
-        _loggingService.LogDebugMessage($"Strava authentication activity has completed: {requestCode}: {resultCode}");
+        _loggingService.Debug($"Strava authentication activity has completed: {requestCode}: {resultCode}");
         _activityIntegrationService.NotifyStravaAuthenticationHasCompleted();
     }
 
@@ -55,7 +55,7 @@ public class MainActivity : MauiAppCompatActivity
             .AddParameter("scope", "activity:read_all")
             .ToString();
 
-        _loggingService.LogDebugMessage("Authenticating to Strava");
+        _loggingService.Debug("Authenticating to Strava");
         var stravaAppIntent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(stravaAppUri));
         StartActivityForResult(stravaAppIntent, StravaAuthorizeCallbackActivity.ActivityRequestCode);
     }
@@ -65,7 +65,7 @@ public class MainActivity : MauiAppCompatActivity
         try
         {
             var intent = GetServiceIntent();
-            _loggingService.LogDebugMessage("Stopping service");
+            _loggingService.Info("Stopping service..");
             StopService(intent);
 
             _gattClient?.Close();
@@ -82,10 +82,10 @@ public class MainActivity : MauiAppCompatActivity
     {
         try
         {
-            _loggingService.LogDebugMessage("Starting service");
+            _loggingService.Info("Starting service...");
             if (_settingsService.Settings.UseCustomDevice)
             {
-                _loggingService.LogDebugMessage("Retrieving BluetoothManager service");
+                _loggingService.Trace("Retrieving BluetoothManager service");
                 var bluetoothManager = (BluetoothManager?) GetSystemService(BluetoothService);
                 if (bluetoothManager is null)
                 {
@@ -94,7 +94,7 @@ public class MainActivity : MauiAppCompatActivity
                     return;
                 }
 
-                _loggingService.LogDebugMessage("Retrieving Bluetooth Adapter");
+                _loggingService.Trace("Retrieving Bluetooth Adapter");
                 var bluetoothAdapter = bluetoothManager.Adapter;
                 if (bluetoothAdapter is null)
                 {
@@ -103,7 +103,7 @@ public class MainActivity : MauiAppCompatActivity
                     return;
                 }
 
-                _loggingService.LogDebugMessage("Retrieving bonded devices");
+                _loggingService.Trace("Retrieving bonded devices");
                 var trackingDevice = bluetoothAdapter.BondedDevices?.FirstOrDefault(d =>
                     d.Name?.Equals("RouteQualityTracker Device", StringComparison.OrdinalIgnoreCase) == true
                     || d.Name?.Equals("QualityTracker", StringComparison.OrdinalIgnoreCase) == true);
@@ -115,9 +115,9 @@ public class MainActivity : MauiAppCompatActivity
                             "Unable to find quality tracking device. Please check if it is connected via Bluetooth"));
                     return;
                 }
-                _loggingService.LogDebugMessage($"Quality tracking device found: {trackingDevice.Name}");
+                _loggingService.Debug($"Quality tracking device found: {trackingDevice.Name}");
 
-                _loggingService.LogDebugMessage("Connecting to Bluetooth device via Gatt");
+                _loggingService.Trace("Connecting to Bluetooth device via Gatt");
                 _gattClient = trackingDevice.ConnectGatt(this, true, new RouteQualityGattCallback());
                 if (_gattClient is null)
                 {
@@ -125,18 +125,18 @@ public class MainActivity : MauiAppCompatActivity
                         new InvalidOperationException("Error connecting to Bluetooth device"));
                     return;
                 }
-                _loggingService.LogDebugMessage("Gatt client connected");
+                _loggingService.Trace("Gatt client connected");
 
                 _serviceManager.SetStatus(true);
             }
 
-            _loggingService.LogDebugMessage("Starting foreground service");
+            _loggingService.Debug("Starting foreground service");
             var intent = GetServiceIntent();
             StartForegroundService(intent);
         }
         catch (Exception ex)
         {
-            _loggingService.LogDebugMessage($"Error starting service: {ex.Message}");
+            _loggingService.Error($"Error starting service: {ex.Message}");
             _serviceManager.SetStatus(false, ex);
         }
     }

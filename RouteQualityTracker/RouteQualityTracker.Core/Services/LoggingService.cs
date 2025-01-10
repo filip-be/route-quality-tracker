@@ -1,22 +1,29 @@
-﻿using RouteQualityTracker.Core.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using RouteQualityTracker.Core.Interfaces;
 
 namespace RouteQualityTracker.Core.Services;
 
 public class LoggingService : ILoggingService
 {
     private readonly TimeProvider _timeProvider;
+    private readonly ISettingsService _settingsService;
 
-    public LoggingService(TimeProvider timeProvider)
+    public LoggingService(TimeProvider timeProvider, ISettingsService settingsService)
     {
         _timeProvider = timeProvider;
+        _settingsService = settingsService;
     }
 
     public event EventHandler<string>? OnLogDebugMessage;
 
-    public void LogDebugMessage(string message)
+    public void LogMessage(LogLevel logLevel, string message)
     {
-        var currentTime = _timeProvider.GetLocalNow().TimeOfDay;
+        if (logLevel < _settingsService.Settings.LogLevel)
+        {
+            return;
+        }
 
+        var currentTime = _timeProvider.GetLocalNow().TimeOfDay;
         OnLogDebugMessage?.Invoke(this, $"{currentTime:hh\\:mm\\:ss} {message}");
     }
 }
