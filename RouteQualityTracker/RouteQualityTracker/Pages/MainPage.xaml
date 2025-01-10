@@ -8,19 +8,14 @@
             Padding="30,0"
             Spacing="25">
             <Image
-                Source="compass.svg"
-                HeightRequest="50"
-                SemanticProperties.Description="compass" />
+                Source="qtrack_icon.svg"
+                HeightRequest="100"
+                SemanticProperties.Description="Route Quality Tracker" />
 
             <Label
-                Text="Hello!"
+                Text="Start tracking your route quality"
                 Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1" />
-
-            <Label
-                Text="Welcome to &#10;Route Quality Tracker"
-                Style="{StaticResource SubHeadline}"
-                SemanticProperties.HeadingLevel="Level2"
+                SemanticProperties.HeadingLevel="Level1"
                 SemanticProperties.Description="Welcome to Route Quality Tracker" />
 
             <Button
@@ -41,7 +36,7 @@
                 x:Name="DebugLabel"
                 Text="Debug log"
                 Style="{StaticResource SubHeadline}"
-                SemanticProperties.HeadingLevel="Level3"
+                SemanticProperties.HeadingLevel="Level2"
                 SemanticProperties.Description="Debug log"
                 HorizontalOptions="Fill" />
             <Editor
